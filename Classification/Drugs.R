@@ -500,7 +500,7 @@ plot(data_rf_train)
 
 
 #####################################
-##         Model Evaluation        ##
+##         Models Evaluation      ##
 #####################################
 #####      Logit Regression      ####
 
@@ -552,6 +552,17 @@ rf_results = summary_binary_class(predicted_classes = rf_fitted,
 ##         Final Model             ##
 #####################################
 
-print(paste0('The best algorithm for our dataset is ', substr(MAPE[1,which(MAPE[2,]==min(MAPE))],11,20), ' with the predicted MAPE equals to ',
-             round(as.numeric(min(MAPE))*100,2),'%'))
+balanced_accuracy  = matrix(1:4, nrow=1, ncol=4)
+
+balanced_accuracy[1,1]=confusionMatrix(as.factor(logit_fitted), data2$consumption_cocaine_last_month)$byClass[11]
+balanced_accuracy[1,2]=confusionMatrix(as.factor(knn_fitted), data2$consumption_cocaine_last_month)$byClass[11]
+balanced_accuracy[1,3]=confusionMatrix(as.factor(svm_fitted), data2$consumption_cocaine_last_month)$byClass[11]
+balanced_accuracy[1,4]=confusionMatrix(as.factor(rf_fitted), data2$consumption_cocaine_last_month)$byClass[11]
+
+colnames(balanced_accuracy) = c("Logit","KNN","SVM","RF")
+rownames(balanced_accuracy) = c("Balanced Accuracy")
+
+print(paste0('The best algorithm for our dataset is ', colnames(balanced_accuracy)[apply(balanced_accuracy,1,which.max)],
+             ' with the predicted Balanced Accuracy equals to ', round(balanced_accuracy[apply(balanced_accuracy,1,which.max)]*100,2),'%'))
+
 
