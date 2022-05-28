@@ -324,7 +324,7 @@ final_logit = data2_logit_train2
 
 k_possible = data.frame(k=seq(1,10,1))
 
-data_knn_train <- 
+data2_knn_train <- 
   train(consumption_cocaine_last_month ~ .,
         data2,        
         method = "knn",
@@ -333,16 +333,13 @@ data_knn_train <-
         tuneGrid = k_possible,
         preProcess = c("range"))
 
-data_knn_train$resample
-summary((data_knn_train$resample$Sens+data_knn_train$resample$Spec)/2)
-plot(data_knn_train)
+data2_knn_train$resample
+summary((data2_knn_train$resample$Sens+data2_knn_train$resample$Spec)/2)
+plot(data2_knn_train)
 
 # We decided to choose final model with k=1
 
 #####      SVM                  ##########
-
-parametersC <-   expand.grid(C = 50,
-                            sigma = 0.5)
 
 data2_svm_train <- 
   train(consumption_cocaine_last_month ~ .,
@@ -351,25 +348,21 @@ data2_svm_train <-
         metric = "Spec",
         trControl = ctrl_cv5)
 
-# We decided to go with C=0.25 and sigma = 0.02186885
-
-
-
-
+# We decided to go with C=0.25 and sigma = 0.022
 
 #####      Random Forest        #####
 
 #Additionally, we decided to train our data using Random Forest algorithm. 
 
-data_rf_train <- 
+data2_rf_train <- 
   train(consumption_cocaine_last_month ~ .,
         data2,        
         method = "rf",
         metric = "Spec",
         trControl = ctrl_cv5)
 
-data_rf_train$results
-plot(data_rf_train)
+data2_rf_train$results
+plot(data2_rf_train)
 
 
 #####################################
@@ -443,29 +436,6 @@ data2_logit_train3 <-
 
 final_logit = data2_logit_train3
 
-#####      KNN                  ##########
-
-# One of the biggest advantage of the KNN algorithm is its simplicity. It is quite intuitive method which simply finds
-# K nearest neighbours. However, in our case this algorithm might not be the best one because our dataset is strongly
-# imbalanced. It might result in getting  less common class wrongly classified.
-
-k_possible = data.frame(k=seq(1,7,1))
-
-data_knn_train <- 
-  train(consumption_cocaine_last_month ~ .,
-        data2.dwng,        
-        method = "knn",
-        metric = "Spec",
-        trControl = ctrl_cv5,
-        tuneGrid = k_possible,
-        preProcess = c("range"))
-
-data_knn_train$resample
-summary((data_knn_train$resample$Sens+data_knn_train$resample$Spec)/2)
-plot(data_knn_train)
-
-# We decided to choose final model with k=7
-
 #####      SVM                  ##########
 
 parametersC <-   expand.grid(C = 0.20,
@@ -495,16 +465,16 @@ data2_rf_train <-
         metric = "Spec",
         trControl = ctrl_cv5)
 
-data_rf_train$results
-plot(data_rf_train)
+data2_rf_train$results
+plot(data2_rf_train)
 
 
 #####################################
-##         Models Evaluation      ##
+##         Models Evaluation       ##
 #####################################
 #####      Logit Regression      ####
 
-logit_fitted = predict(data2_logit_train3, data2)
+logit_fitted = predict(data2_logit_train2, data2)
 table(logit_fitted)
 logit_results = summary_binary_class(predicted_classes = logit_fitted,
                      real = data2$consumption_cocaine_last_month)
@@ -515,6 +485,8 @@ knn_fitted = predict(data2_knn_train, data2)
 table(knn_fitted)
 knn_results = summary_binary_class(predicted_classes = knn_fitted,
                      real = data2$consumption_cocaine_last_month)
+data2_knn_train$finalModel$k
+
 #####      SVM                   ####
 svm_fitted = predict(data2_svm_train, data2)
 table(svm_fitted)
@@ -527,26 +499,6 @@ rf_fitted = predict(data2_rf_train, data2)
 table(rf_fitted)
 rf_results = summary_binary_class(predicted_classes = rf_fitted,
                      real = data2$consumption_cocaine_last_month)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #####################################
 ##         Final Model             ##
