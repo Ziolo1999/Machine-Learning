@@ -1213,7 +1213,7 @@ rf_summary
 final_rfdwng_train = data3_rf_train
 
 #####################################
-##         Model Summary           ##
+##         Aggregation             ##
 #####################################
 
 
@@ -1242,5 +1242,327 @@ sum = rbind(c("Logit",sapply(final_logit_train$resample,mean),
 
 colnames(sum)[c(1,5)] = c("Model","Balanced Accuracy")
 sum
+
+
+
+#####      Dataset 4            ##########
+
+## Data import
+data2 = read.csv("drugs_train.csv")
+
+##Checking for NAs
+colSums(is.na(data2)) %>% 
+  sort()
+#There is no NAs
+
+## Checking types of variables
+sapply(data2, is.character)
+# Id - to be dropped
+data2 = data2[,-1]
+# Converting categorical variables into factors
+
+##Age
+# Two last groups merged into one to be more representative
+table(data2$age)
+data2$age[data2$age=="55-64"] <- "55+"
+data2$age[data2$age == "65+"] <- "55+"
+
+data2$age = factor(data2$age, levels = c("18-24",
+                                         "25-34",
+                                         "35-44",
+                                         "45-54",
+                                         "55+"),
+                   ordered = TRUE)
+
+
+table(data2$age)
+data2$age <- droplevels(data2$age)
+
+prop.table(table(data2$age, data2$consumption_cocaine_last_month),1)
+
+##Gender
+data2$gender = factor(data2$gender, levels = c("male",
+                                               "female"),
+                      ordered = TRUE)
+
+prop.table(table(data2$gender, data2$consumption_cocaine_last_month),1)
+
+##Education
+table(data2$education)
+# We decided to merge people who left school at or before 18 years old into one group
+data2$education[data2$education %in% c("Left school before 16 years",
+                                       "Left school at 16 years",
+                                       "Left school at 17 years",
+                                       "Left school at 18 years")] <- "Left school at or before 18"
+
+data2$education = factor(data2$education, levels = c("Left school at or before 18",
+                                                     "Some college or university, no certificate or degree",
+                                                     "Professional certificate/ diploma",
+                                                     "University degree",
+                                                     "Masters degree",
+                                                     "Doctorate degree"),
+                         ordered = TRUE)
+
+
+
+data2$education <- droplevels(data2$education)
+
+table(data2$education)
+prop.table(table(data2$education, data2$consumption_cocaine_last_month),1)
+
+##Country
+table(data2$country)
+
+data2$country = as.factor(data2$country)
+
+# Canada and Ireland as others because there is not enough observations
+data2$country[data2$country %in% c("Canada",
+                                   "Ireland")] <- "Other"
+
+data2$country <- droplevels(data2$country)
+prop.table(table(data2$country, data2$consumption_cocaine_last_month),1)
+
+##Ethnicity
+table(data2$ethnicity)
+#Ethnicity is dropped because the sample is homogeneous
+data2$ethnicity = as.factor(data2$ethnicity)
+
+##Consumption Alcohol
+table(data2$consumption_alcohol)
+prop.table(table(data2$consumption_alcohol, data2$consumption_cocaine_last_month),1)
+
+data2$consumption_alcohol[data2$consumption_alcohol %in% c("never used",
+                                                           "used over a decade ago",
+                                                           "used in last decade")] <- "never"
+
+data2$consumption_alcohol[data2$consumption_alcohol %in% c("used in last year",
+                                                           "used in last month")] <- "occasionally"
+
+data2$consumption_alcohol[data2$consumption_alcohol %in% c("used in last week",
+                                                           "used in last day")] <- "regularly"
+
+data2$consumption_alcohol = factor(data2$consumption_alcohol, levels = c("never",
+                                                                         "occasionally",
+                                                                         "regularly"),
+                                   ordered = TRUE)
+
+
+##Consumption Amphetamines
+table(data2$consumption_amphetamines)
+
+prop.table(table(data2$consumption_amphetamines, data2$consumption_cocaine_last_month),1)
+
+data2$consumption_amphetamines[data2$consumption_amphetamines %in% c("never used",
+                                                                     "used over a decade ago",
+                                                                     "used in last decade")] <- "never"
+
+data2$consumption_amphetamines[data2$consumption_amphetamines %in% c("used in last year",
+                                                                     "used in last month")] <- "occasionally"
+
+data2$consumption_amphetamines[data2$consumption_amphetamines %in% c("used in last week",
+                                                                     "used in last day")] <- "regularly"
+
+data2$consumption_amphetamines = factor(data2$consumption_amphetamines, levels = c("never",
+                                                                                   "occasionally",
+                                                                                   "regularly"),
+                                        ordered = TRUE)
+## Consumption Caffeine
+table(data2$consumption_caffeine)
+
+# We decided to drop this variable because we believe that it is quite homogeneous 
+# sample and we believe it is not impacting whether person consume cocaine
+colnames(data2)
+prop.table(table(data2$consumption_caffeine, data2$consumption_cocaine_last_month),1)
+data2 = data2[,-15]
+
+##Consumption Cannabis
+table(data2$consumption_cannabis)
+data2$consumption_cannabis[data2$consumption_cannabis %in% c("never used",
+                                                             "used over a decade ago",
+                                                             "used in last decade")] <- "never"
+
+data2$consumption_cannabis[data2$consumption_cannabis %in% c("used in last year",
+                                                             "used in last month")] <- "occasionally"
+
+data2$consumption_cannabis[data2$consumption_cannabis %in% c("used in last week",
+                                                             "used in last day")] <- "regularly"
+
+data2$consumption_cannabis = factor(data2$consumption_cannabis, levels = c("never",
+                                                                           "occasionally",
+                                                                           "regularly"),
+                                    ordered = TRUE)
+prop.table(table(data2$consumption_cannabis, data2$consumption_cocaine_last_month),1)
+
+##Consumption Chocolate
+table(data2$consumption_chocolate)
+prop.table(table(data2$consumption_chocolate, data2$consumption_cocaine_last_month),1)
+
+# We decided to drop this variable because we believe that it is quite homogeneous 
+# sample and we believe it is not impacting whether person consume cocaine
+
+colnames(data2)
+
+data2 = data2[,-16]
+
+
+## Consumption Mushrooms
+table(data2$consumption_mushrooms)
+
+# We decided to merge "used in last day" and "used in last week" into "used in last month" because it would be more representative
+
+data2$consumption_mushrooms[data2$consumption_mushrooms %in% c("never used",
+                                                               "used over a decade ago",
+                                                               "used in last decade")] <- "never"
+
+data2$consumption_mushrooms[data2$consumption_mushrooms %in% c("used in last year",
+                                                               "used in last month")] <- "occasionally"
+
+data2$consumption_mushrooms[data2$consumption_mushrooms %in% c("used in last week",
+                                                               "used in last day")] <- "regularly"
+
+data2$consumption_mushrooms = factor(data2$consumption_mushrooms, levels = c("never",
+                                                                             "occasionally",
+                                                                             "regularly"),
+                                     ordered = TRUE)
+
+prop.table(table(data2$consumption_mushrooms, data2$consumption_cocaine_last_month),1)
+
+##Consumption Nicotine
+table(data2$consumption_nicotine) 
+
+# We decided to downgrade the variable into three groups because we believe that it would be more representative
+data2$consumption_nicotine[data2$consumption_nicotine %in% c("never used",
+                                                             "used over a decade ago",
+                                                             "used in last decade")] <- "never"
+
+data2$consumption_nicotine[data2$consumption_nicotine %in% c("used in last year",
+                                                             "used in last month")] <- "occasionally"
+
+data2$consumption_nicotine[data2$consumption_nicotine %in% c("used in last week",
+                                                             "used in last day")] <- "regularly"
+
+data2$consumption_nicotine = factor(data2$consumption_nicotine, levels = c("never",
+                                                                           "occasionally",
+                                                                           "regularly"),
+                                    ordered = TRUE)
+prop.table(table(data2$consumption_nicotine, data2$consumption_cocaine_last_month),1)
+
+##Consumption Cocaine
+table(data2$consumption_cocaine_last_month)
+
+data2$consumption_cocaine_last_month = factor(data2$consumption_cocaine_last_month, levels = c("No",
+                                                                                               "Yes"),
+                                              ordered = TRUE)
+
+#Checking importance of the variables
+for(i in names(which(sapply(data2,is.factor)))){
+  print(paste(i,round(chisq.test(data2[i], data2$consumption_cocaine_last_month, correct=FALSE)$p.value,4),
+              cramerV(unlist(data2[i]), unlist(data2["consumption_cocaine_last_month"]))
+  ))  
+}
+# The p.value of the "education" variable is above 5%, thus we decided to drop it.
+data2 = data2[,-3]
+
+## Continuous Variables
+for(i in names(which(sapply(data2,is.numeric)))){
+  print(paste(i, min(data2[i]), max(data2[i])))
+}
+
+for(i in names(which(sapply(data2,is.numeric)))){
+  hist(unlist(data2[i]))
+}
+## Histograms of the variables seem to be reasonable
+
+for (i in names(which(sapply(data2,is.numeric)))){
+  print(paste(i,round(t.test(as.formula(paste(i,"~","consumption_cocaine_last_month")),
+                             data=data2, alternative = "two.sided", var.equal = FALSE)$p.value,4)))
+}
+#Numeric variables seem to be okay there are no outliers and data is distributed more or less normally.
+
+
+data2["Personality"] =  
+colnames(data2[sapply(data2,is.numeric)])[apply(data2[sapply(data2,is.numeric)],1,which.max)]
+
+data2$Personality = as.factor(data2$Personality)
+
+data2 = data2[sapply(data2,is.factor)]
+
+#####      Logistic Regression  #####
+
+set.seed(9432398) # We specify random seed
+
+# Train control with cross-validation
+ctrl_cv5 <- trainControl(method = "repeatedcv",
+                         number = 5,
+                         classProbs = TRUE,
+                         summaryFunction = twoClassSummary,
+                         repeats = 3)
+
+## Dataset 2
+# The first step is extending our model with interactions.
+colnames(data2)
+data2_logit_train1 <- 
+  train(consumption_cocaine_last_month ~ . + Personality*consumption_amphetamines 
+        + Personality*consumption_cannabis + Personality*consumption_cannabis,
+        data = data2,        
+        method = "glm",form =    
+        family = "binomial",
+        metric = "Spec",
+        trControl = ctrl_cv5)
+
+summary(data2_logit_train1)
+data2_logit_train1$resample
+
+#####      KNN                  ##########
+
+# One of the biggest advantage of the KNN algorithm is its simplicity. It is quite intuitive method which simply finds
+# K nearest neighbours. However, in our case this algorithm might not be the best one because our dataset is strongly
+# imbalanced. It might result in getting  less common class wrongly classified.
+
+k_possible = data.frame(k=seq(1,15,1))
+
+data2_knn_train <- 
+  train(consumption_cocaine_last_month ~ .,
+        data2,        
+        method = "knn",
+        metric = "Spec",
+        trControl = ctrl_cv5,
+        tuneGrid = k_possible,
+        preProcess = c("range"))
+
+data2_knn_train$finalModel
+data2_knn_train$resample
+
+summary((data2_knn_train$resample$Sens+data2_knn_train$resample$Spec)/2)
+plot(data2_knn_train)
+
+# The KNN results were as we predicted before the analysis. It means that the specifity of the model was extremely low.
+# The plots suggest that we should take as low Ks as possible to maximize Specifity. We observed that 
+# trade of between ROC and Spec and Sens and Spec are relatively low thus we decided to take 2 neighbours.
+# This conclusion is not surprising due to the fact that we have extremely low observations who consume cocaine.
+
+
+#####      SVM                  ##########
+
+parametersC <-   expand.grid(C = 50,
+                             sigma = 0.5)
+
+data2_svm_train <- 
+  train(consumption_cocaine_last_month ~ .,
+        data2,        
+        method = "svmRadial",
+        metric = "Spec",
+        trControl = ctrl_cv5,
+        tuneGrid = parametersC)
+
+svm_summary
+
+# Here we did not decide to choose any model because they wrongly predict. 
+
+
+
+
+
+
 
 
