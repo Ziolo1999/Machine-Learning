@@ -1,0 +1,286 @@
+
+
+---
+title: 'Machine Learning I - Regression - Presentation'
+author: <font size=5><b>- Mateusz Domaradzki&Karol Ziolo</b></font>
+output: 
+  html_document:
+    toc: true # table of content true
+    keep_md: true
+    toc_depth: 3  # upto three depths of headings (specified by #, ## and ###)
+    toc_float: TRUE
+    theme: united
+    highlight: tango
+---
+
+![<font size=5> <b> University of Warsaw - Faculty of Economic Sciences </b></font>](image.jpg)
+<br>
+<br><br>
+<br><br>
+<br><br>
+
+
+# Regression
+
+<br><br>
+
+## Data Preparation
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r biblioteki, message=FALSE, include = FALSE}
+library(knitr)
+library(readxl)
+library(dplyr)
+library(readr)
+library(ggplot2)
+library(zoo)
+library(class)
+library(kernlab)
+library(verification)
+library(ggplot2)
+library(tidyverse)
+library(caret)
+library(MLmetrics)
+```
+
+```{r, data, echo=FALSE, message=FALSE, include=FALSE}
+data <- read.csv("C:/Users/orjen/OneDrive/Desktop/Projekt R/traffic_train.csv")
+```
+```{r, data1,echo=FALSE, message=FALSE, include = FALSE}
+## We decode data into interesting parts for us
+data$date_time <- as.POSIXct(data$date_time, format = "%Y-%m-%d %H:%M:%S")
+## We will check later if quarter, according to our intuition is relevant
+yq <- as.yearqtr(data$date_time, format = "%Y-%m-%d %H:%M:%S")
+data$kwartal<-format(yq, format = "%q")
+## Hour is for sure relevant for the traffic
+data$hour<-format(data$date_time, format='%H')
+data$hour<-as.numeric(data$hour)
+
+## Due to our transformation we receive 3 NAs but it shouldnt be relevant so we just drop them
+data[which(is.na(data$date_time)),]
+data<-na.omit(data)
+```
+
+```{r, Weather, echo=FALSE, message=FALSE, include=FALSE}
+## We decode data into interesting parts for us
+data$date_time <- as.POSIXct(data$date_time, format = "%Y-%m-%d %H:%M:%S")
+## We will check later if quarter, according to our intuition is relevant
+yq <- as.yearqtr(data$date_time, format = "%Y-%m-%d %H:%M:%S")
+data$kwartal<-format(yq, format = "%q")
+## Hour is for sure relevant for the traffic
+data$hour<-format(data$date_time, format='%H')
+data$hour<-as.numeric(data$hour)
+## Due to our transformation we receive 3 NAs but it shouldnt be relevant so we just drop them
+data[which(is.na(data$date_time)),]
+data<-na.omit(data)
+##outliers
+table(data$temperature)
+data<-data[-c(which(data$temperature==-273.1)),]
+
+data<-data[-c(which(data$rain_mm>100)),]
+```
+<br>
+
+### Weather
+
+<br>
+
+<font size=5>We decided to use only weather_general, without detailed verson of it. Thus, we merged some of the levels</font>
+
+```{r, Weather2}
+
+data$weather_general <- as.factor(data$weather_general)
+
+data$weather_general[data$weather_general == "Maze"] <- "Fog"
+data$weather_general[data$weather_general == "Haze"] <- "Smoke"
+data$weather_general[data$weather_general == "Squall"] <- "Thunderstorm"
+```
+
+
+```{r, Weather3, echo=FALSE, MESSAGE=FALSE}
+data$weather_general <- droplevels(data$weather_general)
+a<-kable(table(data$weather_general))
+
+a[[1]]<-"|Variable     |  Frequency|"
+
+a
+```
+<br>
+
+
+### Our transformations
+
+<br>
+<font size=5>Using barplots we noticed that the hour is highly correlated with the level of traffic</font>
+<br>
+
+```{r, Data_godzina}
+time_of_the_day<-function(x) {
+  result<-list()
+  if(x>=6 & x<=8){
+    result<-"Traffic_morning_peak_hour"
+  } 
+  else if(x>8 & x<15){
+    result<-"Working_hours"}
+  else if(x>=15 & x<=17){
+    result<-"Traffic_evening_peak_hour"}
+  else{
+    result <-"night"}
+  return(result)
+}
+```
+<br>
+
+<font size=5>Also the season matters in interactions</font>
+
+```{r, season}
+
+season_of_the_year <- function(x) {
+  result<-list()
+  if(x=='11' || x=='12' || x=='01'){
+    result<-"Winter"
+  } 
+  else if(x=='07' || x=='08' || x=='09' ){
+    result<-"Summer_Holidays"}
+  else{
+    result <-"The_Rest_of_the_season"}
+  return(result)
+}
+
+```
+<br>
+
+<font size=5>The day of the week is also an important factor</font>
+
+
+```{r, day_of_week}
+
+day_of_the_wk<- function(x) {
+  result<-list()
+  if(x=='sobota' || x=='niedziela'){
+    result<-"Weekend"
+  } 
+  else{
+    result <-"Working_day"}
+  return(result)
+}
+
+```
+<br>
+
+
+
+```{r, datatransofrm, echo=FALSE, message=FALSE, include=FALSE}
+data$month<-format(data$date_time, format='%m')
+data$day<-weekdays(data$date_time)
+
+data$season<-lapply(data$month,season_of_the_year)
+data$season<-as.character(data$season)
+data$season<-as.factor(data$season)
+
+data$day2<-lapply(data$day, day_of_the_wk)
+data$day2<-as.character(data$day2)
+data$day2<-as.factor(data$day2)
+
+data$hour2<-lapply(data$hour,time_of_the_day)
+data$hour2<-as.character(data$hour2)
+data$hour2<- as.factor(data$hour2)
+
+data_final<-data[,c(8,2,5,13,14,15)]
+
+```
+<br>
+
+### Final data
+
+<font size=5>Our final data looks like that</font>
+<font size=4>
+<ul>
+  <li>We decided to drop cloud_coverage due to 0 correlation with traffic. </li> 
+  <li>Rain_mm and snow_mm occur so rarely that we won't use them, as we have weather_general which suggest the weather conditions.</li>
+  <li>We dropped some outliers</li>
+</ul> 
+</font>
+
+<br>
+
+```{r, data_final, message=FALSE, echo=FALSE}
+
+kable(head(data_final,20))
+
+```
+
+
+## Best algorithm 
+
+### What we tried?
+
+<br>
+
+<font size=4>
+<ul>
+  <li>OLS </li> 
+  <li>LASSO </li>
+  <li>RIDGE </li>
+  <li>Elastic approach between them </li>
+  <li>KNN </li>
+  <li>SVR </li>
+</ul> 
+</font>
+
+<br>
+
+### The best algorithm - KNN
+
+<br>
+
+```{r, knn1}
+
+ctrl_cv5 <- trainControl(method = "cv",
+                         number = 5)
+
+k_possible <-data.frame(k=19) ## The value 19 is the best for our dataset so im gonna go with it
+
+traffic_knn <- 
+  train(traffic~. + weather_general*hour2  + day2*hour2 + weather_general*day2, 
+        data = data_final,
+        method = "knn",
+        trControl = ctrl_cv5,
+        tuneGrid = k_possible,
+        preProcess = c("range"))
+
+```
+
+<br>
+
+### Plot real data/predicted data
+
+<br>
+```{r, figures-side2, fig.show="hold", echo=FALSE}
+predicted2 = predict(traffic_knn , data_final)
+ggplot(data.frame(real = data_final$traffic,
+                  predicted = predicted2 ),
+       aes(x = predicted, 
+           y = real)) +
+  geom_point(col = "blue") +
+  theme_bw()
+
+```
+
+### EXPECTED MAPE
+
+<font size=4> Im going to apply MAPE from a R package MLmetrics </font>
+
+```{r, figures-side3, fig.show="hold", echo=FALSE}
+
+MAPE(predicted2, data_final$traffic+1)
+
+```
+
+<font size=4> I just added +1 to the data_final$traffic because there are 0 values and there are inf values</font>
+
+<font size=5><b> Our expected MAPE for test dataset equals 2.316903%</b></font>
