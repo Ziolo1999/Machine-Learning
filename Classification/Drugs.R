@@ -25,16 +25,18 @@ colSums(is.na(data2)) %>%
   sort()
 #There is no NAs
 
+data2[which(duplicated(data2)),]
+
 ## Checking types of variables
-sapply(data2, is.character)
+
 # Id - to be dropped
 data2 = data2[,-1]
-
+data2[-c("ethnicity")]
 # Converting categorical variables into factors
 
 ##Age
 # Two last groups merged into one to be more representative
-table(data2$age)
+
 data2$age[data2$age=="55-64"] <- "55+"
 data2$age[data2$age == "65+"] <- "55+"
 
@@ -99,7 +101,6 @@ data2$ethnicity = as.factor(data2$ethnicity)
 
 ##Consumption Alcohol
 table(data2$consumption_alcohol)
-prop.table(table(data2$consumption_alcohol, data2$consumption_cocaine_last_month),1)
 
 data2$consumption_alcohol[data2$consumption_alcohol %in% c("never used",
                                                            "used over a decade ago",
@@ -118,7 +119,7 @@ data2$consumption_alcohol = factor(data2$consumption_alcohol, levels = c("never"
 
 
 ##Consumption Amphetamines
-table(data2$consumption_amphetamines)
+
 
 prop.table(table(data2$consumption_amphetamines, data2$consumption_cocaine_last_month),1)
 
@@ -234,18 +235,24 @@ for(i in names(which(sapply(data2,is.factor)))){
 data2 = data2[,-3]
 
 ## Continuous Variables
+min_max = matrix(1:14,nrow = 7, ncol = 2)
+colnames(min_max) = c("Minimum", "Maximum")
+rownames(min_max) = names(which(sapply(data2,is.numeric)))
+min_max[,1] = apply(data2[names(which(sapply(data2,is.numeric)))],2, min)
+min_max[,2] = apply(data2[names(which(sapply(data2,is.numeric)))],2, max)
+
 for(i in names(which(sapply(data2,is.numeric)))){
   print(paste(i, min(data2[i]), max(data2[i])))
 }
 
 for(i in names(which(sapply(data2,is.numeric)))){
-  hist(unlist(data2[i]))
+  hist(unlist(data2[i]), main=i, xlab="level")
 }
 ## Histograms of the variables seem to be reasonable
 
 for (i in names(which(sapply(data2,is.numeric)))){
-  print(paste(i,round(t.test(as.formula(paste(i,"~","consumption_cocaine_last_month")),
-                             data=data2, alternative = "two.sided", var.equal = FALSE)$p.value,4)))
+  print(as.data.frame(paste(i,round(t.test(as.formula(paste(i,"~","consumption_cocaine_last_month")),
+                             data=data2, alternative = "two.sided", var.equal = FALSE)$p.value,4))))
 }
 #Numeric variables seem to be okay there are no outliers and data is distributed more or less normally.
 
@@ -270,6 +277,8 @@ ctrl_cv5 <- trainControl(method = "repeatedcv",
                          classProbs = TRUE,
                          summaryFunction = twoClassSummary,
                          repeats = 3)
+
+ctrl_cv5$sampling = "up"
 
 ## Dataset 2
 # To increase the performance of the model we decided to add some interactions.
@@ -302,7 +311,7 @@ data2_logit_train2 <-
         metric = "Spec",
         trControl = ctrl_cv5)
 summary(data2_logit_train2)
-
+data2_logit_train2$resample
 # We decided to drop ethnicity because it is not significant.
 data2_logit_train3 <- 
   train(consumption_cocaine_last_month ~ .,
