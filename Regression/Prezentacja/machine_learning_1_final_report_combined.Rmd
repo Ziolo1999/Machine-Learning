@@ -311,7 +311,7 @@ season_of_the_year <- function(x) {
     result<-"Winter"
   } 
   else if(x=='07' || x=='08' || x=='09' ){
-    result<-"Summer_Holidays"}
+    result<-"Summer_Holidays"}g
   else{
     result <-"The_Rest_of_the_season"}
   return(result)

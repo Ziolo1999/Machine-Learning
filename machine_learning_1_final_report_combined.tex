@@ -1,0 +1,2242 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Machine Learning I - Regression - Presentation},
+  pdfauthor={- Mateusz Domaradzki \& Karol Ziolo},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\title{Machine Learning I - Regression - Presentation}
+\author{- Mateusz Domaradzki \& Karol Ziolo}
+\date{}
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{3}
+\tableofcontents
+}
+\includegraphics{image.jpg}
+
+\hypertarget{regression}{%
+\section{Regression}\label{regression}}
+
+\hypertarget{data-preparation}{%
+\subsection{Data Preparation}\label{data-preparation}}
+
+\hypertarget{general-outlook-on-data}{%
+\subsubsection{General outlook on data}\label{general-outlook-on-data}}
+
+I read in the data
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"Regression/traffic_train.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+I check if there are duplicates or NAs
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{colSums}\NormalTok{(}\KeywordTok{is.na}\NormalTok{(data)) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{sort}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##           date_time     weather_general    weather_detailed clouds_coverage_pct 
+##                   0                   0                   0                   0 
+##         temperature             rain_mm             snow_mm             traffic 
+##                   0                   0                   0                   0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data[}\KeywordTok{which}\NormalTok{(}\KeywordTok{duplicated}\NormalTok{(data)),]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                 date_time weather_general weather_detailed clouds_coverage_pct
+## 28795 2018-12-02 09:00:00            Mist             mist                  90
+## 28796 2018-12-02 09:00:00            Snow       light snow                  90
+##       temperature rain_mm snow_mm traffic
+## 28795         0.6       0       0    2331
+## 28796         0.6       0       0    2334
+\end{verbatim}
+
+Not really so we can move forward and check pattern in time
+
+\includegraphics{machine_learning_1_final_report_combined_files/figure-latex/pattern_date-1.pdf}
+
+\hypertarget{time-preparation}{%
+\subsubsection{Time preparation}\label{time-preparation}}
+
+I extract the most interesting part of date-time
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data}\OperatorTok{$}\NormalTok{date_time <-}\StringTok{ }\KeywordTok{as.POSIXct}\NormalTok{(data}\OperatorTok{$}\NormalTok{date_time, }\DataTypeTok{format =} \StringTok{"%Y-%m-%d %H:%M:%S"}\NormalTok{)}
+\NormalTok{yq <-}\StringTok{ }\KeywordTok{as.yearqtr}\NormalTok{(data}\OperatorTok{$}\NormalTok{date_time, }\DataTypeTok{format =} \StringTok{"%Y-%m-%d %H:%M:%S"}\NormalTok{)}
+\NormalTok{data}\OperatorTok{$}\NormalTok{kwartal<-}\KeywordTok{format}\NormalTok{(yq, }\DataTypeTok{format =} \StringTok{"%q"}\NormalTok{)}
+\NormalTok{data}\OperatorTok{$}\NormalTok{kwartal<-}\StringTok{ }\KeywordTok{as.factor}\NormalTok{(data}\OperatorTok{$}\NormalTok{kwartal)}
+\NormalTok{data}\OperatorTok{$}\NormalTok{hour<-}\KeywordTok{format}\NormalTok{(data}\OperatorTok{$}\NormalTok{date_time, }\DataTypeTok{format=}\StringTok{'%H'}\NormalTok{)}
+\NormalTok{data}\OperatorTok{$}\NormalTok{month<-}\KeywordTok{format}\NormalTok{(data}\OperatorTok{$}\NormalTok{date_time, }\DataTypeTok{format=}\StringTok{'%m'}\NormalTok{)}
+\NormalTok{data}\OperatorTok{$}\NormalTok{day<-}\KeywordTok{weekdays}\NormalTok{(data}\OperatorTok{$}\NormalTok{date_time)}
+\end{Highlighting}
+\end{Shaded}
+
+I apply a function to transform hours to parts of the day according to
+the plot given below. It's also logical and even based in life that
+people are trying to commute to home in different hours. The best
+feeling is driving a car in an empty city at 3 am
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{time_of_the_day<-}\ControlFlowTok{function}\NormalTok{(x) \{}
+\NormalTok{  result<-}\KeywordTok{list}\NormalTok{()}
+  \ControlFlowTok{if}\NormalTok{(x}\OperatorTok{>=}\DecValTok{6} \OperatorTok{&}\StringTok{ }\NormalTok{x}\OperatorTok{<=}\DecValTok{8}\NormalTok{)\{}
+\NormalTok{    result<-}\StringTok{"Traffic_morning_peak_hour"}
+\NormalTok{  \} }
+  \ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{(x}\OperatorTok{>}\DecValTok{8} \OperatorTok{&}\StringTok{ }\NormalTok{x}\OperatorTok{<}\DecValTok{15}\NormalTok{)\{}
+\NormalTok{    result<-}\StringTok{"Working_hours"}\NormalTok{\}}
+  \ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{(x}\OperatorTok{>=}\DecValTok{15} \OperatorTok{&}\StringTok{ }\NormalTok{x}\OperatorTok{<=}\DecValTok{17}\NormalTok{)\{}
+\NormalTok{    result<-}\StringTok{"Traffic_evening_peak_hour"}\NormalTok{\}}
+  \ControlFlowTok{else}\NormalTok{\{}
+\NormalTok{    result <-}\StringTok{"night"}\NormalTok{\}}
+  \KeywordTok{return}\NormalTok{(result)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{machine_learning_1_final_report_combined_files/figure-latex/pattern_date2-1.pdf}
+let's apply the function
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data}\OperatorTok{$}\NormalTok{hour2<-}\KeywordTok{lapply}\NormalTok{(data}\OperatorTok{$}\NormalTok{hour,time_of_the_day)}
+\NormalTok{data}\OperatorTok{$}\NormalTok{hour2<-}\KeywordTok{as.character}\NormalTok{(data}\OperatorTok{$}\NormalTok{hour2)}
+\NormalTok{data}\OperatorTok{$}\NormalTok{hour2<-}\StringTok{ }\KeywordTok{as.factor}\NormalTok{(data}\OperatorTok{$}\NormalTok{hour2)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{weather-preparation}{%
+\subsubsection{Weather preparation}\label{weather-preparation}}
+
+I have to admit that we decided to not use this more rich in description
+weather column because we saw many things that we have to merge and
+diversity provided in weather\_general is good enough to judge what
+should happen with the traffic. At all not every weather state should
+affect traffic so we just drop it instantly
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{kable}\NormalTok{(}\KeywordTok{table}\NormalTok{(data}\OperatorTok{$}\NormalTok{weather_general)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{sort}\NormalTok{(}\DataTypeTok{decreasing =} \OtherTok{FALSE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] "|:------------|-----:|" "|Clear        |  8030|" "|Clouds       | 10163|"
+##  [4] "|Drizzle      |   919|" "|Fog          |   481|" "|Haze         |   743|"
+##  [7] "|Mist         |  3491|" "|Rain         |  3559|" "|Smoke        |    17|"
+## [10] "|Snow         |  1794|" "|Squall       |     4|" "|Thunderstorm |   497|"
+## [13] "|Var1         |  Freq|"
+\end{verbatim}
+
+I decided to merge some of them because logicaly there are the same and
+should not affect our traffic. Of course we can check if the values are
+different by filtering the data but it may results in overfitting the
+model. Let's keep it simple
+
+Things that should be merged in my opinion:
+
+Merge fog and mist
+
+Smoke and Haze
+
+Squall and Thunderstorm
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data}\OperatorTok{$}\NormalTok{weather_general <-}\StringTok{ }\KeywordTok{as.factor}\NormalTok{(data}\OperatorTok{$}\NormalTok{weather_general)}
+
+\NormalTok{data}\OperatorTok{$}\NormalTok{weather_general[data}\OperatorTok{$}\NormalTok{weather_general }\OperatorTok{==}\StringTok{ "Maze"}\NormalTok{] <-}\StringTok{ "Fog"}
+\NormalTok{data}\OperatorTok{$}\NormalTok{weather_general[data}\OperatorTok{$}\NormalTok{weather_general }\OperatorTok{==}\StringTok{ "Haze"}\NormalTok{] <-}\StringTok{ "Smoke"}
+\NormalTok{data}\OperatorTok{$}\NormalTok{weather_general[data}\OperatorTok{$}\NormalTok{weather_general }\OperatorTok{==}\StringTok{ "Squall"}\NormalTok{] <-}\StringTok{ "Thunderstorm"}
+
+\NormalTok{data}\OperatorTok{$}\NormalTok{weather_general <-}\StringTok{ }\KeywordTok{droplevels}\NormalTok{(data}\OperatorTok{$}\NormalTok{weather_general)}
+\KeywordTok{kable}\NormalTok{(}\KeywordTok{table}\NormalTok{(data}\OperatorTok{$}\NormalTok{weather_general))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule
+Var1 & Freq\tabularnewline
+\midrule
+\endhead
+Clear & 8030\tabularnewline
+Clouds & 10163\tabularnewline
+Drizzle & 919\tabularnewline
+Fog & 481\tabularnewline
+Mist & 3491\tabularnewline
+Rain & 3559\tabularnewline
+Smoke & 760\tabularnewline
+Snow & 1794\tabularnewline
+Thunderstorm & 501\tabularnewline
+\bottomrule
+\end{longtable}
+
+We won't also use snow nor rain because those things are pretty always
+equal to 0
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{kable}\NormalTok{(}\KeywordTok{head}\NormalTok{(}\KeywordTok{table}\NormalTok{(data}\OperatorTok{$}\NormalTok{snow_mm),}\DecValTok{10}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule
+Var1 & Freq\tabularnewline
+\midrule
+\endhead
+0 & 29635\tabularnewline
+0.05 & 14\tabularnewline
+0.06 & 12\tabularnewline
+0.08 & 2\tabularnewline
+0.1 & 6\tabularnewline
+0.13 & 6\tabularnewline
+0.17 & 3\tabularnewline
+0.21 & 1\tabularnewline
+0.25 & 6\tabularnewline
+0.32 & 5\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{kable}\NormalTok{(}\KeywordTok{head}\NormalTok{(}\KeywordTok{table}\NormalTok{(data}\OperatorTok{$}\NormalTok{rain_mm),}\DecValTok{10}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule
+Var1 & Freq\tabularnewline
+\midrule
+\endhead
+0 & 26944\tabularnewline
+0.25 & 679\tabularnewline
+0.26 & 2\tabularnewline
+0.27 & 5\tabularnewline
+0.28 & 19\tabularnewline
+0.29 & 4\tabularnewline
+0.3 & 119\tabularnewline
+0.31 & 2\tabularnewline
+0.32 & 12\tabularnewline
+0.33 & 1\tabularnewline
+\bottomrule
+\end{longtable}
+
+Lets check temperature
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{kable}\NormalTok{(}\KeywordTok{head}\NormalTok{(}\KeywordTok{table}\NormalTok{(data}\OperatorTok{$}\NormalTok{temperature),}\DecValTok{10}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule
+Var1 & Freq\tabularnewline
+\midrule
+\endhead
+-273.1 & 10\tabularnewline
+-29.8 & 1\tabularnewline
+-29.5 & 1\tabularnewline
+-28.9 & 1\tabularnewline
+-28.3 & 4\tabularnewline
+-27.5 & 1\tabularnewline
+-27.4 & 3\tabularnewline
+-27.1 & 1\tabularnewline
+-27 & 1\tabularnewline
+-26.9 & 1\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data<-data[}\OperatorTok{-}\KeywordTok{c}\NormalTok{(}\KeywordTok{which}\NormalTok{(data}\OperatorTok{$}\NormalTok{temperature}\OperatorTok{==-}\FloatTok{273.1}\NormalTok{)),]}
+\NormalTok{data<-data[}\OperatorTok{-}\KeywordTok{c}\NormalTok{(}\KeywordTok{which}\NormalTok{(data}\OperatorTok{$}\NormalTok{rain_mm}\OperatorTok{>}\DecValTok{100}\NormalTok{)),]}
+\end{Highlighting}
+\end{Shaded}
+
+Data seems to be various but we have some outliers (at least I dont
+believe that we can achieve -273.1. Also I dropped an outlier from rain
+(I believe that is an ouliter)
+
+\hypertarget{feature-selection}{%
+\subsubsection{Feature selection}\label{feature-selection}}
+
+We also need to check if the data is at least correlated to traffic
+
+\begin{longtable}[]{@{}lrrrrr@{}}
+\toprule
+& clouds\_coverage\_pct & temperature & rain\_mm & snow\_mm &
+traffic\tabularnewline
+\midrule
+\endhead
+clouds\_coverage\_pct & 1.0000000 & -0.1703894 & 0.0886892 & 0.0351593 &
+0.0393405\tabularnewline
+temperature & -0.1703894 & 1.0000000 & 0.1027189 & -0.0250283 &
+0.1344646\tabularnewline
+rain\_mm & 0.0886892 & 0.1027189 & 1.0000000 & 0.0002111 &
+-0.0302496\tabularnewline
+snow\_mm & 0.0351593 & -0.0250283 & 0.0002111 & 1.0000000 &
+0.0014836\tabularnewline
+traffic & 0.0393405 & 0.1344646 & -0.0302496 & 0.0014836 &
+1.0000000\tabularnewline
+\bottomrule
+\end{longtable}
+
+Now im sure that I won't use nor rain nor snow nor covarage
+
+Also ANOVA for categorical values
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule
+& x\tabularnewline
+\midrule
+\endhead
+hour2 & 5652.41041\tabularnewline
+weather\_general & 49.88013\tabularnewline
+kwartal & 22.20645\tabularnewline
+\bottomrule
+\end{longtable}
+
+A lot of can be improved
+
+some ggplots to improve dataset
+
+\includegraphics{machine_learning_1_final_report_combined_files/figure-latex/ggplot-1.pdf}
+
+\includegraphics{machine_learning_1_final_report_combined_files/figure-latex/ggplot2-1.pdf}
+
+By that we will create 2 functions to divide months and days into useful
+parts
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{season_of_the_year <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x) \{}
+\NormalTok{  result<-}\KeywordTok{list}\NormalTok{()}
+  \ControlFlowTok{if}\NormalTok{(x}\OperatorTok{==}\StringTok{'11'} \OperatorTok{||}\StringTok{ }\NormalTok{x}\OperatorTok{==}\StringTok{'12'} \OperatorTok{||}\StringTok{ }\NormalTok{x}\OperatorTok{==}\StringTok{'01'}\NormalTok{)\{}
+\NormalTok{    result<-}\StringTok{"Winter"}
+\NormalTok{  \} }
+  \ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{(x}\OperatorTok{==}\StringTok{'07'} \OperatorTok{||}\StringTok{ }\NormalTok{x}\OperatorTok{==}\StringTok{'08'} \OperatorTok{||}\StringTok{ }\NormalTok{x}\OperatorTok{==}\StringTok{'09'}\NormalTok{ )\{}
+\NormalTok{    result<-}\StringTok{"Summer_Holidays"}\NormalTok{\}}
+  \ControlFlowTok{else}\NormalTok{\{}
+\NormalTok{    result <-}\StringTok{"The_Rest_of_the_season"}\NormalTok{\}}
+  \KeywordTok{return}\NormalTok{(result)}
+\NormalTok{\}}
+
+\NormalTok{day_of_the_wk<-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x) \{}
+\NormalTok{  result<-}\KeywordTok{list}\NormalTok{()}
+  \ControlFlowTok{if}\NormalTok{(x}\OperatorTok{==}\StringTok{'sobota'} \OperatorTok{||}\StringTok{ }\NormalTok{x}\OperatorTok{==}\StringTok{'niedziela'}\NormalTok{)\{}
+\NormalTok{    result<-}\StringTok{"Weekend"}
+\NormalTok{  \} }
+  \ControlFlowTok{else}\NormalTok{\{}
+\NormalTok{    result <-}\StringTok{"Working_day"}\NormalTok{\}}
+  \KeywordTok{return}\NormalTok{(result)}
+\NormalTok{\}}
+
+\NormalTok{data}\OperatorTok{$}\NormalTok{season<-}\KeywordTok{lapply}\NormalTok{(data}\OperatorTok{$}\NormalTok{month,season_of_the_year)}
+\NormalTok{data}\OperatorTok{$}\NormalTok{season<-}\KeywordTok{as.character}\NormalTok{(data}\OperatorTok{$}\NormalTok{season)}
+\NormalTok{data}\OperatorTok{$}\NormalTok{season<-}\KeywordTok{as.factor}\NormalTok{(data}\OperatorTok{$}\NormalTok{season)}
+
+\NormalTok{data}\OperatorTok{$}\NormalTok{day2<-}\KeywordTok{lapply}\NormalTok{(data}\OperatorTok{$}\NormalTok{day, day_of_the_wk)}
+\NormalTok{data}\OperatorTok{$}\NormalTok{day2<-}\KeywordTok{as.character}\NormalTok{(data}\OperatorTok{$}\NormalTok{day2)}
+\NormalTok{data}\OperatorTok{$}\NormalTok{day2<-}\KeywordTok{as.factor}\NormalTok{(data}\OperatorTok{$}\NormalTok{day2)}
+\end{Highlighting}
+\end{Shaded}
+
+last ANOVA to check if we are in a better position
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule
+& x\tabularnewline
+\midrule
+\endhead
+hour2 & 5652.41041\tabularnewline
+day2 & 1596.66607\tabularnewline
+season & 60.38177\tabularnewline
+weather\_general & 49.88013\tabularnewline
+kwartal & 22.20645\tabularnewline
+\bottomrule
+\end{longtable}
+
+That's seems like a success so I go to proceed some algorithms
+
+Our final dataset:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data_final<-data[,}\KeywordTok{c}\NormalTok{(}\DecValTok{8}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{5}\NormalTok{,}\DecValTok{13}\NormalTok{,}\DecValTok{14}\NormalTok{,}\DecValTok{15}\NormalTok{)]}
+\KeywordTok{kable}\NormalTok{(}\KeywordTok{head}\NormalTok{(data_final,}\DecValTok{20}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}rlrlll@{}}
+\toprule
+traffic & weather\_general & temperature & hour2 & season &
+day2\tabularnewline
+\midrule
+\endhead
+508 & Clear & 11.5 & night & The\_Rest\_of\_the\_season &
+Working\_day\tabularnewline
+323 & Clear & 10.3 & night & The\_Rest\_of\_the\_season &
+Working\_day\tabularnewline
+274 & Clear & 8.0 & night & The\_Rest\_of\_the\_season &
+Working\_day\tabularnewline
+372 & Clear & 7.9 & night & The\_Rest\_of\_the\_season &
+Working\_day\tabularnewline
+812 & Clear & 6.4 & night & The\_Rest\_of\_the\_season &
+Working\_day\tabularnewline
+2720 & Clear & 5.5 & night & The\_Rest\_of\_the\_season &
+Working\_day\tabularnewline
+5674 & Clear & 5.1 & night & The\_Rest\_of\_the\_season &
+Working\_day\tabularnewline
+6512 & Clear & 5.0 & night & The\_Rest\_of\_the\_season &
+Working\_day\tabularnewline
+5473 & Clear & 9.3 & night & The\_Rest\_of\_the\_season &
+Working\_day\tabularnewline
+5096 & Clear & 18.8 & night & The\_Rest\_of\_the\_season &
+Working\_day\tabularnewline
+4887 & Clear & 20.1 & night & The\_Rest\_of\_the\_season &
+Working\_day\tabularnewline
+5335 & Clear & 21.2 & night & The\_Rest\_of\_the\_season &
+Working\_day\tabularnewline
+5699 & Clear & 22.0 & Traffic\_evening\_peak\_hour &
+The\_Rest\_of\_the\_season & Working\_day\tabularnewline
+6130 & Clear & 22.0 & Traffic\_evening\_peak\_hour &
+The\_Rest\_of\_the\_season & Working\_day\tabularnewline
+4620 & Clouds & 20.5 & night & The\_Rest\_of\_the\_season &
+Working\_day\tabularnewline
+3594 & Clouds & 17.5 & night & The\_Rest\_of\_the\_season &
+Working\_day\tabularnewline
+2895 & Clouds & 15.0 & night & The\_Rest\_of\_the\_season &
+Working\_day\tabularnewline
+2643 & Clear & 14.0 & night & The\_Rest\_of\_the\_season &
+Working\_day\tabularnewline
+1783 & Clear & 13.1 & night & The\_Rest\_of\_the\_season &
+Working\_day\tabularnewline
+1017 & Clear & 12.1 & night & The\_Rest\_of\_the\_season &
+Working\_day\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{algorithms}{%
+\subsection{Algorithms}\label{algorithms}}
+
+We decided that we are going to try to use more or less those 5
+algorithms
+
+OLS
+
+LASSO
+
+RIDGE
+
+Elastic approach between them
+
+KNN
+
+SVR
+
+Due to computational issues I decided to present only final parameteres
+for every selected algorithm. I checked a range values of K for KNN etc
+but including for example more possibilities for SVR would kill my
+computer
+
+We will try to check both ends, I mean high variance and low bias plus
+low variance and high bias then we will use linear regression +
+Lasso/Ridge. Then we have two imporant efficient algorithms KNN which is
+one of the most optimal accoring to books and SVR which is also very
+sufficient especially if we have weird combinations in dataset
+
+\hypertarget{linear-regression}{%
+\subsubsection{Linear regression}\label{linear-regression}}
+
+setting the right options
+
+I will try 2 models, one clear and one with interactions between
+variables. I've been doing some experiments with them and which are the
+best so below I will show only the best interactions I could find and
+that are logical for me
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#model without interactions}
+\NormalTok{traffic_lm <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(traffic}\OperatorTok{~}\NormalTok{. }\DecValTok{-1}\NormalTok{, }
+                 \DataTypeTok{data =}\NormalTok{ data_final) }
+
+\KeywordTok{summary}\NormalTok{(traffic_lm)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = traffic ~ . - 1, data = data_final)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4911.8 -1402.5    41.6  1445.7  4427.3 
+## 
+## Coefficients:
+##                                Estimate Std. Error t value Pr(>|t|)    
+## weather_generalClear           1734.785     36.742  47.216  < 2e-16 ***
+## weather_generalClouds          1998.959     37.944  52.682  < 2e-16 ***
+## weather_generalDrizzle         1769.942     68.043  26.012  < 2e-16 ***
+## weather_generalFog             1556.417     85.940  18.111  < 2e-16 ***
+## weather_generalMist            1663.915     45.189  36.821  < 2e-16 ***
+## weather_generalRain            1744.106     45.784  38.094  < 2e-16 ***
+## weather_generalSmoke           2250.029     71.794  31.340  < 2e-16 ***
+## weather_generalSnow            1863.488     53.915  34.563  < 2e-16 ***
+## weather_generalThunderstorm    1392.242     85.219  16.337  < 2e-16 ***
+## temperature                      22.893      1.147  19.953  < 2e-16 ***
+## hour2Traffic_evening_peak_hour 2317.681     31.399  73.813  < 2e-16 ***
+## seasonThe_Rest_of_the_season    332.376     29.283  11.351  < 2e-16 ***
+## seasonWinter                    292.033     39.627   7.369 1.76e-13 ***
+## day2Working_day                 987.993     22.428  44.052  < 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 1744 on 29673 degrees of freedom
+## Multiple R-squared:  0.7885, Adjusted R-squared:  0.7884 
+## F-statistic:  7904 on 14 and 29673 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#model with interactions}
+\NormalTok{traffic_lm2 <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(traffic}\OperatorTok{~}\NormalTok{. }\OperatorTok{+}\StringTok{ }\NormalTok{weather_general}\OperatorTok{*}\NormalTok{hour2  }\OperatorTok{+}\StringTok{ }\NormalTok{day2}\OperatorTok{*}\NormalTok{hour2 }\OperatorTok{+}\StringTok{ }\NormalTok{weather_general}\OperatorTok{*}\NormalTok{day2 }\DecValTok{-1}\NormalTok{, }\CommentTok{# best formula}
+                 \DataTypeTok{data =}\NormalTok{ data_final)}
+\KeywordTok{summary}\NormalTok{(traffic_lm2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = traffic ~ . + weather_general * hour2 + day2 * hour2 + 
+##     weather_general * day2 - 1, data = data_final)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4415.4 -1411.2    34.4  1442.6  4526.8 
+## 
+## Coefficients:
+##                                                            Estimate Std. Error
+## weather_generalClear                                       1892.641     44.577
+## weather_generalClouds                                      2130.941     45.385
+## weather_generalDrizzle                                     1845.135    117.212
+## weather_generalFog                                         1121.575    143.798
+## weather_generalMist                                        1530.677     63.193
+## weather_generalRain                                        1753.733     65.920
+## weather_generalSmoke                                       2085.923    123.648
+## weather_generalSnow                                        1926.640     86.537
+## weather_generalThunderstorm                                1104.823    138.808
+## temperature                                                  23.066      1.148
+## hour2Traffic_evening_peak_hour                             1960.609     79.509
+## seasonThe_Rest_of_the_season                                330.650     29.222
+## seasonWinter                                                294.128     39.552
+## day2Working_day                                             736.169     42.930
+## weather_generalClouds:hour2Traffic_evening_peak_hour       -276.044     79.268
+## weather_generalDrizzle:hour2Traffic_evening_peak_hour        36.089    181.647
+## weather_generalFog:hour2Traffic_evening_peak_hour          -725.057    402.884
+## weather_generalMist:hour2Traffic_evening_peak_hour          -45.670    131.054
+## weather_generalRain:hour2Traffic_evening_peak_hour          -54.000    107.048
+## weather_generalSmoke:hour2Traffic_evening_peak_hour        -552.226    187.054
+## weather_generalSnow:hour2Traffic_evening_peak_hour         -295.007    145.793
+## weather_generalThunderstorm:hour2Traffic_evening_peak_hour   10.510    276.394
+## hour2Traffic_evening_peak_hour:day2Working_day              728.934     68.645
+## weather_generalClouds:day2Working_day                        89.838     57.372
+## weather_generalDrizzle:day2Working_day                      113.515    135.426
+## weather_generalFog:day2Working_day                          918.116    175.789
+## weather_generalMist:day2Working_day                         429.810     77.452
+## weather_generalRain:day2Working_day                         217.306     78.338
+## weather_generalSmoke:day2Working_day                        574.414    144.680
+## weather_generalSnow:day2Working_day                         180.172    102.551
+## weather_generalThunderstorm:day2Working_day                 670.847    168.856
+##                                                            t value Pr(>|t|)    
+## weather_generalClear                                        42.457  < 2e-16 ***
+## weather_generalClouds                                       46.952  < 2e-16 ***
+## weather_generalDrizzle                                      15.742  < 2e-16 ***
+## weather_generalFog                                           7.800 6.41e-15 ***
+## weather_generalMist                                         24.222  < 2e-16 ***
+## weather_generalRain                                         26.604  < 2e-16 ***
+## weather_generalSmoke                                        16.870  < 2e-16 ***
+## weather_generalSnow                                         22.264  < 2e-16 ***
+## weather_generalThunderstorm                                  7.959 1.79e-15 ***
+## temperature                                                 20.101  < 2e-16 ***
+## hour2Traffic_evening_peak_hour                              24.659  < 2e-16 ***
+## seasonThe_Rest_of_the_season                                11.315  < 2e-16 ***
+## seasonWinter                                                 7.437 1.06e-13 ***
+## day2Working_day                                             17.148  < 2e-16 ***
+## weather_generalClouds:hour2Traffic_evening_peak_hour        -3.482 0.000498 ***
+## weather_generalDrizzle:hour2Traffic_evening_peak_hour        0.199 0.842519    
+## weather_generalFog:hour2Traffic_evening_peak_hour           -1.800 0.071923 .  
+## weather_generalMist:hour2Traffic_evening_peak_hour          -0.348 0.727483    
+## weather_generalRain:hour2Traffic_evening_peak_hour          -0.504 0.613953    
+## weather_generalSmoke:hour2Traffic_evening_peak_hour         -2.952 0.003157 ** 
+## weather_generalSnow:hour2Traffic_evening_peak_hour          -2.023 0.043034 *  
+## weather_generalThunderstorm:hour2Traffic_evening_peak_hour   0.038 0.969668    
+## hour2Traffic_evening_peak_hour:day2Working_day              10.619  < 2e-16 ***
+## weather_generalClouds:day2Working_day                        1.566 0.117387    
+## weather_generalDrizzle:day2Working_day                       0.838 0.401922    
+## weather_generalFog:day2Working_day                           5.223 1.77e-07 ***
+## weather_generalMist:day2Working_day                          5.549 2.89e-08 ***
+## weather_generalRain:day2Working_day                          2.774 0.005542 ** 
+## weather_generalSmoke:day2Working_day                         3.970 7.20e-05 ***
+## weather_generalSnow:day2Working_day                          1.757 0.078947 .  
+## weather_generalThunderstorm:day2Working_day                  3.973 7.12e-05 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 1739 on 29656 degrees of freedom
+## Multiple R-squared:   0.79,  Adjusted R-squared:  0.7898 
+## F-statistic:  3598 on 31 and 29656 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{traffic_predicted <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(traffic_lm)}
+\NormalTok{traffic_predicted2 <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(traffic_lm2)}
+\end{Highlighting}
+\end{Shaded}
+
+let's plot real vs predicted values
+
+\includegraphics{machine_learning_1_final_report_combined_files/figure-latex/olsplot-1.pdf}
+\includegraphics{machine_learning_1_final_report_combined_files/figure-latex/olsplot-2.pdf}
+
+\hypertarget{lassoridgeelastic-approach}{%
+\subsubsection{Lasso/Ridge/Elastic
+approach}\label{lassoridgeelastic-approach}}
+
+The good thing about lasso/Ridge is that we can apply both of them to
+erase non important values and set aplha at a certain level to chose
+which one we would love to use. This method is at the other end of
+bias/variance trade plot
+
+\hypertarget{ridge}{%
+\paragraph{Ridge}\label{ridge}}
+
+lets start with ridge regression
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ctrl_cv5 <-}\StringTok{ }\KeywordTok{trainControl}\NormalTok{(}\DataTypeTok{method =} \StringTok{"cv"}\NormalTok{,}
+                         \DataTypeTok{number =} \DecValTok{5}\NormalTok{) }\CommentTok{## cross-validation}
+
+
+\NormalTok{parameters_ridge <-}\StringTok{ }\KeywordTok{expand.grid}\NormalTok{(}\DataTypeTok{alpha =} \DecValTok{0}\NormalTok{,}
+                                \DataTypeTok{lambda =} \KeywordTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{1e3}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+
+\NormalTok{traffic_ridge <-}\StringTok{ }\KeywordTok{train}\NormalTok{(traffic}\OperatorTok{~}\NormalTok{. }\OperatorTok{+}\StringTok{ }\NormalTok{weather_general}\OperatorTok{*}\NormalTok{hour2  }\OperatorTok{+}\StringTok{ }\NormalTok{day2}\OperatorTok{*}\NormalTok{hour2 }\OperatorTok{+}\StringTok{ }\NormalTok{weather_general}\OperatorTok{*}\NormalTok{day2 }\DecValTok{-1}\NormalTok{,}
+                       \DataTypeTok{data =}\NormalTok{ data_final,}
+                       \DataTypeTok{method =} \StringTok{"glmnet"}\NormalTok{, }
+                       \DataTypeTok{tuneGrid =}\NormalTok{ parameters_ridge,}
+                       \DataTypeTok{trControl =}\NormalTok{ ctrl_cv5)}
+
+\NormalTok{traffic_ridge}\OperatorTok{$}\NormalTok{bestTune}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    alpha lambda
+## 80     0     79
+\end{verbatim}
+
+Lamba is equals 79 so really close to the linear regression. Lets check
+LASSO -\textgreater{} RMSE about 1740
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{parameters_lasso <-}\StringTok{ }\KeywordTok{expand.grid}\NormalTok{(}\DataTypeTok{alpha =} \DecValTok{1}\NormalTok{,}
+                                \DataTypeTok{lambda =} \KeywordTok{seq}\NormalTok{(}\DecValTok{1}\NormalTok{, }\FloatTok{1e4}\NormalTok{, }\DecValTok{10}\NormalTok{))}
+
+\NormalTok{traffic_lasso<-}\StringTok{ }\KeywordTok{train}\NormalTok{(traffic}\OperatorTok{~}\NormalTok{. }\OperatorTok{+}\StringTok{ }\NormalTok{weather_general}\OperatorTok{*}\NormalTok{hour2  }\OperatorTok{+}\StringTok{ }\NormalTok{day2}\OperatorTok{*}\NormalTok{hour2 }\OperatorTok{+}\StringTok{ }\NormalTok{weather_general}\OperatorTok{*}\NormalTok{day2 }\DecValTok{-1}\NormalTok{,}
+                      \DataTypeTok{data =}\NormalTok{ data_final,}
+                      \DataTypeTok{method =} \StringTok{"glmnet"}\NormalTok{, }
+                      \DataTypeTok{tuneGrid =}\NormalTok{ parameters_lasso,}
+                      \DataTypeTok{trControl =}\NormalTok{ ctrl_cv5)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in nominalTrainWorkflow(x = x, y = y, wts = weights, info = trainInfo, :
+## There were missing values in resampled performance measures.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{traffic_lasso}\OperatorTok{$}\NormalTok{bestTune}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   alpha lambda
+## 1     1      1
+\end{verbatim}
+
+lambda and alfa equals to 1, very interesting to be honest
+
+Let's check the elastic approach in Alpha
+
+I experimented some with this algorithm to check between which values of
+lambada/alpha I should choose. Do thousands or houndreds are required?
+Not really, the best set is with lambda between 0 and 10 with alpha
+around 0.8
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{2137}\NormalTok{) }\CommentTok{## Let's set seed because lambda and alfa may vary but there are both really similar, just to keep it constant}
+\NormalTok{parameters_elastic2 <-}\StringTok{ }\KeywordTok{expand.grid}\NormalTok{(}\DataTypeTok{alpha =} \KeywordTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{, }\FloatTok{0.2}\NormalTok{), }
+                                   \DataTypeTok{lambda =} \KeywordTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{, }\FloatTok{0.1}\NormalTok{))}
+
+\NormalTok{traffic_elastic <-}\StringTok{ }\KeywordTok{train}\NormalTok{(traffic}\OperatorTok{~}\NormalTok{. }\OperatorTok{+}\StringTok{ }\NormalTok{weather_general}\OperatorTok{*}\NormalTok{hour2  }\OperatorTok{+}\StringTok{ }\NormalTok{day2}\OperatorTok{*}\NormalTok{hour2 }\OperatorTok{+}\StringTok{ }\NormalTok{weather_general}\OperatorTok{*}\NormalTok{day2,}
+                         \DataTypeTok{data =}\NormalTok{ data_final,}
+                         \DataTypeTok{method =} \StringTok{"glmnet"}\NormalTok{, }
+                         \DataTypeTok{tuneGrid =}\NormalTok{ parameters_elastic2,}
+                         \DataTypeTok{trControl =}\NormalTok{ ctrl_cv5)}
+
+
+\NormalTok{traffic_elastic}\OperatorTok{$}\NormalTok{bestTune}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     alpha lambda
+## 122   0.2      2
+\end{verbatim}
+
+So we may be quite sure that between those 3 algorithms we are going to
+the next point with an elastic approach and alpha=0.2 with lambda = 2
+
+\includegraphics{machine_learning_1_final_report_combined_files/figure-latex/elastic_plot-1.pdf}
+
+\hypertarget{knn}{%
+\subsubsection{KNN}\label{knn}}
+
+I decided to use this algorithm because in my books on Machine Learning
+they say this algorithm may be the most accurate one in many cases. What
+I mean, we don't really use any presumptions and we only match something
+because of neighbours. In this case, when it's hard for my data to fit
+in any kind of regression that assume for example normal distribution,
+or try to fit to data any coefficients this one may be really relevant
+player. We will see at the end in the comparison!
+
+Once again i experimented between different values of K for KNN and I
+decided to go with 19
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ctrl_cv5 <-}\StringTok{ }\KeywordTok{trainControl}\NormalTok{(}\DataTypeTok{method =} \StringTok{"cv"}\NormalTok{,}
+                         \DataTypeTok{number =} \DecValTok{5}\NormalTok{)}
+
+\NormalTok{k_possible <-}\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{k=}\DecValTok{19}\NormalTok{) }\CommentTok{## The value 19 is the best for our dataset so im gonna go with it}
+
+\NormalTok{traffic_knn <-}\StringTok{ }
+\StringTok{  }\KeywordTok{train}\NormalTok{(traffic}\OperatorTok{~}\NormalTok{. }\OperatorTok{+}\StringTok{ }\NormalTok{weather_general}\OperatorTok{*}\NormalTok{hour2  }\OperatorTok{+}\StringTok{ }\NormalTok{day2}\OperatorTok{*}\NormalTok{hour2 }\OperatorTok{+}\StringTok{ }\NormalTok{weather_general}\OperatorTok{*}\NormalTok{day2, }
+        \DataTypeTok{data =}\NormalTok{ data_final,}
+        \DataTypeTok{method =} \StringTok{"knn"}\NormalTok{,}
+        \DataTypeTok{trControl =}\NormalTok{ ctrl_cv5,}
+        \DataTypeTok{tuneGrid =}\NormalTok{ k_possible,}
+        \DataTypeTok{preProcess =} \KeywordTok{c}\NormalTok{(}\StringTok{"range"}\NormalTok{))}
+
+\CommentTok{## k=19 is the lowest RMSE we can obtain, So I will go with that.}
+\end{Highlighting}
+\end{Shaded}
+
+let's plot it
+
+\begin{verbatim}
+## List of 93
+##  $ line                      :List of 6
+##   ..$ colour       : chr "black"
+##   ..$ size         : num 0.5
+##   ..$ linetype     : num 1
+##   ..$ lineend      : chr "butt"
+##   ..$ arrow        : logi FALSE
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_line" "element"
+##  $ rect                      :List of 5
+##   ..$ fill         : chr "white"
+##   ..$ colour       : chr "black"
+##   ..$ size         : num 0.5
+##   ..$ linetype     : num 1
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_rect" "element"
+##  $ text                      :List of 11
+##   ..$ family       : chr ""
+##   ..$ face         : chr "plain"
+##   ..$ colour       : chr "black"
+##   ..$ size         : num 11
+##   ..$ hjust        : num 0.5
+##   ..$ vjust        : num 0.5
+##   ..$ angle        : num 0
+##   ..$ lineheight   : num 0.9
+##   ..$ margin       : 'margin' num [1:4] 0points 0points 0points 0points
+##   .. ..- attr(*, "unit")= int 8
+##   ..$ debug        : logi FALSE
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_text" "element"
+##  $ title                     : NULL
+##  $ aspect.ratio              : NULL
+##  $ axis.title                : NULL
+##  $ axis.title.x              :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : NULL
+##   ..$ size         : NULL
+##   ..$ hjust        : NULL
+##   ..$ vjust        : num 1
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : 'margin' num [1:4] 2.75points 0points 0points 0points
+##   .. ..- attr(*, "unit")= int 8
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_text" "element"
+##  $ axis.title.x.top          :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : NULL
+##   ..$ size         : NULL
+##   ..$ hjust        : NULL
+##   ..$ vjust        : num 0
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : 'margin' num [1:4] 0points 0points 2.75points 0points
+##   .. ..- attr(*, "unit")= int 8
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_text" "element"
+##  $ axis.title.x.bottom       : NULL
+##  $ axis.title.y              :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : NULL
+##   ..$ size         : NULL
+##   ..$ hjust        : NULL
+##   ..$ vjust        : num 1
+##   ..$ angle        : num 90
+##   ..$ lineheight   : NULL
+##   ..$ margin       : 'margin' num [1:4] 0points 2.75points 0points 0points
+##   .. ..- attr(*, "unit")= int 8
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_text" "element"
+##  $ axis.title.y.left         : NULL
+##  $ axis.title.y.right        :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : NULL
+##   ..$ size         : NULL
+##   ..$ hjust        : NULL
+##   ..$ vjust        : num 0
+##   ..$ angle        : num -90
+##   ..$ lineheight   : NULL
+##   ..$ margin       : 'margin' num [1:4] 0points 0points 0points 2.75points
+##   .. ..- attr(*, "unit")= int 8
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_text" "element"
+##  $ axis.text                 :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : chr "grey30"
+##   ..$ size         : 'rel' num 0.8
+##   ..$ hjust        : NULL
+##   ..$ vjust        : NULL
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : NULL
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_text" "element"
+##  $ axis.text.x               :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : NULL
+##   ..$ size         : NULL
+##   ..$ hjust        : NULL
+##   ..$ vjust        : num 1
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : 'margin' num [1:4] 2.2points 0points 0points 0points
+##   .. ..- attr(*, "unit")= int 8
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_text" "element"
+##  $ axis.text.x.top           :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : NULL
+##   ..$ size         : NULL
+##   ..$ hjust        : NULL
+##   ..$ vjust        : num 0
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : 'margin' num [1:4] 0points 0points 2.2points 0points
+##   .. ..- attr(*, "unit")= int 8
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_text" "element"
+##  $ axis.text.x.bottom        : NULL
+##  $ axis.text.y               :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : NULL
+##   ..$ size         : NULL
+##   ..$ hjust        : num 1
+##   ..$ vjust        : NULL
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : 'margin' num [1:4] 0points 2.2points 0points 0points
+##   .. ..- attr(*, "unit")= int 8
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_text" "element"
+##  $ axis.text.y.left          : NULL
+##  $ axis.text.y.right         :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : NULL
+##   ..$ size         : NULL
+##   ..$ hjust        : num 0
+##   ..$ vjust        : NULL
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : 'margin' num [1:4] 0points 0points 0points 2.2points
+##   .. ..- attr(*, "unit")= int 8
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_text" "element"
+##  $ axis.ticks                :List of 6
+##   ..$ colour       : chr "grey20"
+##   ..$ size         : NULL
+##   ..$ linetype     : NULL
+##   ..$ lineend      : NULL
+##   ..$ arrow        : logi FALSE
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_line" "element"
+##  $ axis.ticks.x              : NULL
+##  $ axis.ticks.x.top          : NULL
+##  $ axis.ticks.x.bottom       : NULL
+##  $ axis.ticks.y              : NULL
+##  $ axis.ticks.y.left         : NULL
+##  $ axis.ticks.y.right        : NULL
+##  $ axis.ticks.length         : 'simpleUnit' num 2.75points
+##   ..- attr(*, "unit")= int 8
+##  $ axis.ticks.length.x       : NULL
+##  $ axis.ticks.length.x.top   : NULL
+##  $ axis.ticks.length.x.bottom: NULL
+##  $ axis.ticks.length.y       : NULL
+##  $ axis.ticks.length.y.left  : NULL
+##  $ axis.ticks.length.y.right : NULL
+##  $ axis.line                 : list()
+##   ..- attr(*, "class")= chr [1:2] "element_blank" "element"
+##  $ axis.line.x               : NULL
+##  $ axis.line.x.top           : NULL
+##  $ axis.line.x.bottom        : NULL
+##  $ axis.line.y               : NULL
+##  $ axis.line.y.left          : NULL
+##  $ axis.line.y.right         : NULL
+##  $ legend.background         :List of 5
+##   ..$ fill         : NULL
+##   ..$ colour       : logi NA
+##   ..$ size         : NULL
+##   ..$ linetype     : NULL
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_rect" "element"
+##  $ legend.margin             : 'margin' num [1:4] 5.5points 5.5points 5.5points 5.5points
+##   ..- attr(*, "unit")= int 8
+##  $ legend.spacing            : 'simpleUnit' num 11points
+##   ..- attr(*, "unit")= int 8
+##  $ legend.spacing.x          : NULL
+##  $ legend.spacing.y          : NULL
+##  $ legend.key                :List of 5
+##   ..$ fill         : chr "white"
+##   ..$ colour       : logi NA
+##   ..$ size         : NULL
+##   ..$ linetype     : NULL
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_rect" "element"
+##  $ legend.key.size           : 'simpleUnit' num 1.2lines
+##   ..- attr(*, "unit")= int 3
+##  $ legend.key.height         : NULL
+##  $ legend.key.width          : NULL
+##  $ legend.text               :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : NULL
+##   ..$ size         : 'rel' num 0.8
+##   ..$ hjust        : NULL
+##   ..$ vjust        : NULL
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : NULL
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_text" "element"
+##  $ legend.text.align         : NULL
+##  $ legend.title              :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : NULL
+##   ..$ size         : NULL
+##   ..$ hjust        : num 0
+##   ..$ vjust        : NULL
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : NULL
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_text" "element"
+##  $ legend.title.align        : NULL
+##  $ legend.position           : chr "right"
+##  $ legend.direction          : NULL
+##  $ legend.justification      : chr "center"
+##  $ legend.box                : NULL
+##  $ legend.box.just           : NULL
+##  $ legend.box.margin         : 'margin' num [1:4] 0cm 0cm 0cm 0cm
+##   ..- attr(*, "unit")= int 1
+##  $ legend.box.background     : list()
+##   ..- attr(*, "class")= chr [1:2] "element_blank" "element"
+##  $ legend.box.spacing        : 'simpleUnit' num 11points
+##   ..- attr(*, "unit")= int 8
+##  $ panel.background          :List of 5
+##   ..$ fill         : chr "white"
+##   ..$ colour       : logi NA
+##   ..$ size         : NULL
+##   ..$ linetype     : NULL
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_rect" "element"
+##  $ panel.border              :List of 5
+##   ..$ fill         : logi NA
+##   ..$ colour       : chr "grey20"
+##   ..$ size         : NULL
+##   ..$ linetype     : NULL
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_rect" "element"
+##  $ panel.spacing             : 'simpleUnit' num 5.5points
+##   ..- attr(*, "unit")= int 8
+##  $ panel.spacing.x           : NULL
+##  $ panel.spacing.y           : NULL
+##  $ panel.grid                :List of 6
+##   ..$ colour       : chr "grey92"
+##   ..$ size         : NULL
+##   ..$ linetype     : NULL
+##   ..$ lineend      : NULL
+##   ..$ arrow        : logi FALSE
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_line" "element"
+##  $ panel.grid.major          : NULL
+##  $ panel.grid.minor          :List of 6
+##   ..$ colour       : NULL
+##   ..$ size         : 'rel' num 0.5
+##   ..$ linetype     : NULL
+##   ..$ lineend      : NULL
+##   ..$ arrow        : logi FALSE
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_line" "element"
+##  $ panel.grid.major.x        : NULL
+##  $ panel.grid.major.y        : NULL
+##  $ panel.grid.minor.x        : NULL
+##  $ panel.grid.minor.y        : NULL
+##  $ panel.ontop               : logi FALSE
+##  $ plot.background           :List of 5
+##   ..$ fill         : NULL
+##   ..$ colour       : chr "white"
+##   ..$ size         : NULL
+##   ..$ linetype     : NULL
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_rect" "element"
+##  $ plot.title                :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : NULL
+##   ..$ size         : 'rel' num 1.2
+##   ..$ hjust        : num 0
+##   ..$ vjust        : num 1
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : 'margin' num [1:4] 0points 0points 5.5points 0points
+##   .. ..- attr(*, "unit")= int 8
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_text" "element"
+##  $ plot.title.position       : chr "panel"
+##  $ plot.subtitle             :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : NULL
+##   ..$ size         : NULL
+##   ..$ hjust        : num 0
+##   ..$ vjust        : num 1
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : 'margin' num [1:4] 0points 0points 5.5points 0points
+##   .. ..- attr(*, "unit")= int 8
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_text" "element"
+##  $ plot.caption              :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : NULL
+##   ..$ size         : 'rel' num 0.8
+##   ..$ hjust        : num 1
+##   ..$ vjust        : num 1
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : 'margin' num [1:4] 5.5points 0points 0points 0points
+##   .. ..- attr(*, "unit")= int 8
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_text" "element"
+##  $ plot.caption.position     : chr "panel"
+##  $ plot.tag                  :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : NULL
+##   ..$ size         : 'rel' num 1.2
+##   ..$ hjust        : num 0.5
+##   ..$ vjust        : num 0.5
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : NULL
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_text" "element"
+##  $ plot.tag.position         : chr "topleft"
+##  $ plot.margin               : 'margin' num [1:4] 5.5points 5.5points 5.5points 5.5points
+##   ..- attr(*, "unit")= int 8
+##  $ strip.background          :List of 5
+##   ..$ fill         : chr "grey85"
+##   ..$ colour       : chr "grey20"
+##   ..$ size         : NULL
+##   ..$ linetype     : NULL
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_rect" "element"
+##  $ strip.background.x        : NULL
+##  $ strip.background.y        : NULL
+##  $ strip.placement           : chr "inside"
+##  $ strip.text                :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : chr "grey10"
+##   ..$ size         : 'rel' num 0.8
+##   ..$ hjust        : NULL
+##   ..$ vjust        : NULL
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : 'margin' num [1:4] 4.4points 4.4points 4.4points 4.4points
+##   .. ..- attr(*, "unit")= int 8
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_text" "element"
+##  $ strip.text.x              : NULL
+##  $ strip.text.y              :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : NULL
+##   ..$ size         : NULL
+##   ..$ hjust        : NULL
+##   ..$ vjust        : NULL
+##   ..$ angle        : num -90
+##   ..$ lineheight   : NULL
+##   ..$ margin       : NULL
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_text" "element"
+##  $ strip.switch.pad.grid     : 'simpleUnit' num 2.75points
+##   ..- attr(*, "unit")= int 8
+##  $ strip.switch.pad.wrap     : 'simpleUnit' num 2.75points
+##   ..- attr(*, "unit")= int 8
+##  $ strip.text.y.left         :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : NULL
+##   ..$ size         : NULL
+##   ..$ hjust        : NULL
+##   ..$ vjust        : NULL
+##   ..$ angle        : num 90
+##   ..$ lineheight   : NULL
+##   ..$ margin       : NULL
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi TRUE
+##   ..- attr(*, "class")= chr [1:2] "element_text" "element"
+##  - attr(*, "class")= chr [1:2] "theme" "gg"
+##  - attr(*, "complete")= logi TRUE
+##  - attr(*, "validate")= logi TRUE
+\end{verbatim}
+
+\includegraphics{machine_learning_1_final_report_combined_files/figure-latex/elastic_plot_knn-1.pdf}
+
+\hypertarget{svr}{%
+\subsubsection{SVR}\label{svr}}
+
+I would like to start with a point that my laptop is kinda slow and I
+didn't menage to estimate any combination of sigma and C on a full
+dataset. So I drew a sample of 10\% observations and then adjusted my
+sigma and C. Therefore this would be the most optimal algorithm but I
+don't have a possibility to check it. Thus, below I present the best
+possible algorithm I could estimate on a random sample. Then of course I
+checked that on a biggest sample (around 30\% of observations) and
+couple times on a full dataset. But most estimations were conducted on
+small samples
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{parametersC_sigma2 <-}\StringTok{ }
+\StringTok{  }\KeywordTok{expand.grid}\NormalTok{(}\DataTypeTok{C =} \DecValTok{415}\NormalTok{,}
+              \DataTypeTok{sigma =} \FloatTok{0.1}\NormalTok{)}
+
+
+\NormalTok{svm_Radial2 <-}\StringTok{ }\KeywordTok{train}\NormalTok{(traffic}\OperatorTok{~}\NormalTok{. }\OperatorTok{+}\StringTok{ }\NormalTok{weather_general}\OperatorTok{*}\NormalTok{hour2  }\OperatorTok{+}\StringTok{ }\NormalTok{day2}\OperatorTok{*}\NormalTok{hour2 }\OperatorTok{+}\StringTok{ }\NormalTok{weather_general}\OperatorTok{*}\NormalTok{day2, }
+                            \DataTypeTok{data =}\NormalTok{ data_final, }
+                            \DataTypeTok{method =} \StringTok{"svmRadial"}\NormalTok{,}
+                            \DataTypeTok{tuneGrid =}\NormalTok{ parametersC_sigma2,}
+                            \DataTypeTok{trControl =}\NormalTok{ ctrl_cv5)}
+\NormalTok{svm_Radial2}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Support Vector Machines with Radial Basis Function Kernel 
+## 
+## 29687 samples
+##     5 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (5 fold) 
+## Summary of sample sizes: 23750, 23751, 23748, 23750, 23749 
+## Resampling results:
+## 
+##   RMSE      Rsquared   MAE     
+##   1754.957  0.2323844  1435.961
+## 
+## Tuning parameter 'sigma' was held constant at a value of 0.1
+## Tuning
+##  parameter 'C' was held constant at a value of 415
+\end{verbatim}
+
+\includegraphics{machine_learning_1_final_report_combined_files/figure-latex/elastic_plot_svr-1.pdf}
+
+\hypertarget{mape-between-all-algorithms}{%
+\subsection{MAPE between all
+algorithms}\label{mape-between-all-algorithms}}
+
+I wrote a function to check it for me
+
+First im gonna create a data frame with our predictions
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{predicted_ols <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(traffic_lm, data_final)}
+\NormalTok{predicted_lasso_ridge <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(traffic_elastic , data_final)}
+\NormalTok{predicted_svr <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(svm_Radial2 , data_final)}
+\NormalTok{predicted_knn <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(traffic_knn, data_final)}
+
+\NormalTok{predictions<-}\KeywordTok{data.frame}\NormalTok{(predicted_ols,predicted_lasso_ridge,predicted_svr,predicted_knn)}
+
+\NormalTok{MAPE<-}\KeywordTok{matrix}\NormalTok{(}\DecValTok{8}\NormalTok{,}\DataTypeTok{nrow=}\DecValTok{2}\NormalTok{,}\DataTypeTok{ncol=}\DecValTok{4}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+then let's create a function that will judge for us and return the best
+option
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{length}\NormalTok{(predictions))}
+\NormalTok{\{}
+\NormalTok{  MAPE[}\DecValTok{1}\NormalTok{,i] <-}\KeywordTok{colnames}\NormalTok{(predictions[i])}
+\NormalTok{  MAPE[}\DecValTok{2}\NormalTok{,i] <-}\KeywordTok{MAPE}\NormalTok{(}\KeywordTok{unlist}\NormalTok{(predictions[i]), data_final}\OperatorTok{$}\NormalTok{traffic}\OperatorTok{+}\DecValTok{1}\NormalTok{)}
+  \ControlFlowTok{if}\NormalTok{(i}\OperatorTok{==}\KeywordTok{length}\NormalTok{(predictions))}
+\NormalTok{  \{}
+    \KeywordTok{print}\NormalTok{(}\KeywordTok{paste0}\NormalTok{(}\StringTok{'The best algorithm for our dataset is '}\NormalTok{, }\KeywordTok{substr}\NormalTok{(MAPE[}\DecValTok{1}\NormalTok{,}\KeywordTok{which}\NormalTok{(MAPE[}\DecValTok{2}\NormalTok{,]}\OperatorTok{==}\KeywordTok{min}\NormalTok{(MAPE))],}\DecValTok{11}\NormalTok{,}\DecValTok{20}\NormalTok{), }\StringTok{' with the predicted MAPE equals to '}\NormalTok{,}
+           \KeywordTok{round}\NormalTok{(}\KeywordTok{as.numeric}\NormalTok{(}\KeywordTok{min}\NormalTok{(MAPE)),}\DecValTok{2}\NormalTok{),}\StringTok{'%'}\NormalTok{))}
+    
+\NormalTok{  \}}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "The best algorithm for our dataset is knn with the predicted MAPE equals to 3.24%"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{kable}\NormalTok{(MAPE)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+\endhead
+predicted\_ols & predicted\_lasso\_ridge & predicted\_svr &
+predicted\_knn\tabularnewline
+3.47050073877648 & 3.41662626111629 & 3.28266342056404 &
+3.23502440338716\tabularnewline
+\bottomrule
+\end{longtable}
+
+So at the end I can only say that our book to Machine Learning was quite
+right in a judge that KNN is very often a most optimal alogirhtm.
+Definitely im gonna finish this book during our summer break
+
+Expected error? about 2-3\% in MAPE. Exactly 2.33\%
+
+\hypertarget{classification}{%
+\section{Classification}\label{classification}}
+
+\hypertarget{data-exploration}{%
+\subsection{Data Exploration}\label{data-exploration}}
+
+\hypertarget{general-outlook-on-data-1}{%
+\subsubsection{General outlook on
+data}\label{general-outlook-on-data-1}}
+
+Let read the data.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data2 =}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"Classification/drugs_train.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+My first step was to check for NAs.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{kable}\NormalTok{(}\KeywordTok{colSums}\NormalTok{(}\KeywordTok{is.na}\NormalTok{(data2)) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{sort}\NormalTok{())}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule
+& x\tabularnewline
+\midrule
+\endhead
+id & 0\tabularnewline
+age & 0\tabularnewline
+gender & 0\tabularnewline
+education & 0\tabularnewline
+country & 0\tabularnewline
+ethnicity & 0\tabularnewline
+personality\_neuroticism & 0\tabularnewline
+personality\_extraversion & 0\tabularnewline
+personality\_openness & 0\tabularnewline
+personality\_agreeableness & 0\tabularnewline
+personality\_conscientiousness & 0\tabularnewline
+personality\_impulsiveness & 0\tabularnewline
+personality\_sensation & 0\tabularnewline
+consumption\_alcohol & 0\tabularnewline
+consumption\_amphetamines & 0\tabularnewline
+consumption\_caffeine & 0\tabularnewline
+consumption\_cannabis & 0\tabularnewline
+consumption\_chocolate & 0\tabularnewline
+consumption\_mushrooms & 0\tabularnewline
+consumption\_nicotine & 0\tabularnewline
+consumption\_cocaine\_last\_month & 0\tabularnewline
+\bottomrule
+\end{longtable}
+
+We do not have any NAs thus we can move forward and check which
+variables are characters.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{kable}\NormalTok{(}\KeywordTok{sapply}\NormalTok{(data2, is.character))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+& x\tabularnewline
+\midrule
+\endhead
+id & TRUE\tabularnewline
+age & TRUE\tabularnewline
+gender & TRUE\tabularnewline
+education & TRUE\tabularnewline
+country & TRUE\tabularnewline
+ethnicity & TRUE\tabularnewline
+personality\_neuroticism & FALSE\tabularnewline
+personality\_extraversion & FALSE\tabularnewline
+personality\_openness & FALSE\tabularnewline
+personality\_agreeableness & FALSE\tabularnewline
+personality\_conscientiousness & FALSE\tabularnewline
+personality\_impulsiveness & FALSE\tabularnewline
+personality\_sensation & FALSE\tabularnewline
+consumption\_alcohol & TRUE\tabularnewline
+consumption\_amphetamines & TRUE\tabularnewline
+consumption\_caffeine & TRUE\tabularnewline
+consumption\_cannabis & TRUE\tabularnewline
+consumption\_chocolate & TRUE\tabularnewline
+consumption\_mushrooms & TRUE\tabularnewline
+consumption\_nicotine & TRUE\tabularnewline
+consumption\_cocaine\_last\_month & TRUE\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data2 =}\StringTok{ }\NormalTok{data2[,}\OperatorTok{-}\DecValTok{1}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+We have noticed that there is an ID column which we decided to drop
+because it is not valuable for us.
+
+\hypertarget{age}{%
+\subsubsection{Age}\label{age}}
+
+As it is presented below people were divided into six age groups.
+However, we have noticed that its distribution is slightly imbalanced.
+Thus, we decided to merge groups ``55-64'' and ``65+'' into one group
+called ``55+'' to be more representative.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{kable}\NormalTok{(}\KeywordTok{table}\NormalTok{(data2}\OperatorTok{$}\NormalTok{age))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule
+Var1 & Freq\tabularnewline
+\midrule
+\endhead
+18-24 & 528\tabularnewline
+25-34 & 375\tabularnewline
+35-44 & 278\tabularnewline
+45-54 & 233\tabularnewline
+55-64 & 72\tabularnewline
+65+ & 14\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data2}\OperatorTok{$}\NormalTok{age[data2}\OperatorTok{$}\NormalTok{age}\OperatorTok{==}\StringTok{"55-64"}\NormalTok{] <-}\StringTok{ "55+"}
+\NormalTok{data2}\OperatorTok{$}\NormalTok{age[data2}\OperatorTok{$}\NormalTok{age }\OperatorTok{==}\StringTok{ "65+"}\NormalTok{] <-}\StringTok{ "55+"}
+
+\NormalTok{data2}\OperatorTok{$}\NormalTok{age =}\StringTok{ }\KeywordTok{factor}\NormalTok{(data2}\OperatorTok{$}\NormalTok{age, }\DataTypeTok{levels =} \KeywordTok{c}\NormalTok{(}\StringTok{"18-24"}\NormalTok{,}
+                                         \StringTok{"25-34"}\NormalTok{,}
+                                         \StringTok{"35-44"}\NormalTok{,}
+                                         \StringTok{"45-54"}\NormalTok{,}
+                                         \StringTok{"55+"}\NormalTok{),}\DataTypeTok{ordered =} \OtherTok{TRUE}\NormalTok{)}
+
+\NormalTok{data2}\OperatorTok{$}\NormalTok{age <-}\StringTok{ }\KeywordTok{droplevels}\NormalTok{(data2}\OperatorTok{$}\NormalTok{age)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{gender}{%
+\subsubsection{Gender}\label{gender}}
+
+As of Gender variable we modified it into factors.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data2}\OperatorTok{$}\NormalTok{gender =}\StringTok{ }\KeywordTok{factor}\NormalTok{(data2}\OperatorTok{$}\NormalTok{gender, }\DataTypeTok{levels =} \KeywordTok{c}\NormalTok{(}\StringTok{"male"}\NormalTok{,}\StringTok{"female"}\NormalTok{), }\DataTypeTok{ordered =} \OtherTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{education}{%
+\subsubsection{Education}\label{education}}
+
+The education variable is divided into many levels, which again is not
+distributed evenly. We have many disproportions so we decided to merge
+people who left school at or before 18 into one group.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{kable}\NormalTok{(}\KeywordTok{table}\NormalTok{(data2}\OperatorTok{$}\NormalTok{education))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule
+Var1 & Freq\tabularnewline
+\midrule
+\endhead
+Doctorate degree & 66\tabularnewline
+Left school at 16 years & 72\tabularnewline
+Left school at 17 years & 26\tabularnewline
+Left school at 18 years & 85\tabularnewline
+Left school before 16 years & 20\tabularnewline
+Masters degree & 229\tabularnewline
+Professional certificate/ diploma & 221\tabularnewline
+Some college or university, no certificate or degree &
+405\tabularnewline
+University degree & 376\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data2}\OperatorTok{$}\NormalTok{education[data2}\OperatorTok{$}\NormalTok{education }\OperatorTok{%in%}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"Left school before 16 years"}\NormalTok{,}
+                                       \StringTok{"Left school at 16 years"}\NormalTok{,}
+                                       \StringTok{"Left school at 17 years"}\NormalTok{,}
+                                       \StringTok{"Left school at 18 years"}\NormalTok{)] <-}\StringTok{ "Left school at or before 18"}
+
+\NormalTok{data2}\OperatorTok{$}\NormalTok{education =}\StringTok{ }\KeywordTok{factor}\NormalTok{(data2}\OperatorTok{$}\NormalTok{education, }\DataTypeTok{levels =} \KeywordTok{c}\NormalTok{(}\StringTok{"Left school at or before 18"}\NormalTok{,}
+                                                     \StringTok{"Some college or university, no certificate or degree"}\NormalTok{,}
+                                                     \StringTok{"Professional certificate/ diploma"}\NormalTok{,}
+                                                     \StringTok{"University degree"}\NormalTok{,}
+                                                     \StringTok{"Masters degree"}\NormalTok{,}
+                                                     \StringTok{"Doctorate degree"}\NormalTok{),}
+                         \DataTypeTok{ordered =} \OtherTok{TRUE}\NormalTok{)}
+\NormalTok{data2}\OperatorTok{$}\NormalTok{education <-}\StringTok{ }\KeywordTok{droplevels}\NormalTok{(data2}\OperatorTok{$}\NormalTok{education)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{country}{%
+\subsubsection{Country}\label{country}}
+
+As for the country variable we have noticed that most people are from
+Australia or USA. However, there is small number of people from Canada
+and Ireland so we decided to assign them to the group of others.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{kable}\NormalTok{(}\KeywordTok{table}\NormalTok{(data2}\OperatorTok{$}\NormalTok{country))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule
+Var1 & Freq\tabularnewline
+\midrule
+\endhead
+Australia & 460\tabularnewline
+Canada & 5\tabularnewline
+Ireland & 13\tabularnewline
+New Zealand & 94\tabularnewline
+Other & 44\tabularnewline
+UK & 73\tabularnewline
+USA & 811\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data2}\OperatorTok{$}\NormalTok{country[data2}\OperatorTok{$}\NormalTok{country }\OperatorTok{%in%}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"Canada"}\NormalTok{,}\StringTok{"Ireland"}\NormalTok{)] <-}\StringTok{ "Other"}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ethnicity}{%
+\subsubsection{Ethnicity}\label{ethnicity}}
+
+We checked the Ethnicity variable and we have noticed that sample is
+practically homogeneous. Thus, we decided to drop it because it does not
+provide any reliable information regarding other ethnic groups.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{kable}\NormalTok{(}\KeywordTok{table}\NormalTok{(data2}\OperatorTok{$}\NormalTok{ethnicity))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule
+Var1 & Freq\tabularnewline
+\midrule
+\endhead
+Asian & 25\tabularnewline
+Black & 22\tabularnewline
+Mixed-Black/Asian & 1372\tabularnewline
+Mixed-White/Asian & 15\tabularnewline
+Mixed-White/Black & 47\tabularnewline
+Other & 16\tabularnewline
+White & 3\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data2 =}\StringTok{ }\NormalTok{data2[,}\OperatorTok{-}\DecValTok{5}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{consumption}{%
+\subsubsection{Consumption}\label{consumption}}
+
+We believe that variables that concern consumption should be grouped
+because the frequency split is too broad. It was decided to downgrade it
+into three groups: ``regularly'', ``occasionally'' and ``never''. We
+also consider that ``Consumption Chocolate'' and ``Consumption
+Caffeine'' do not have any direct impact whether person consumes cocaine
+so we decided to drop them from our dataset.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Vector of consumption variables which concern us }
+\NormalTok{consumption_variables =}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"consumption_alcohol"}\NormalTok{, }\StringTok{"consumption_amphetamines"}\NormalTok{, }
+                          \StringTok{"consumption_cannabis"}\NormalTok{, }\StringTok{"consumption_mushrooms"}\NormalTok{, }
+                          \StringTok{"consumption_nicotine"}\NormalTok{)}
+\CommentTok{# Grouping function}
+\NormalTok{fun =}\StringTok{ }
+\StringTok{  }\ControlFlowTok{function}\NormalTok{(x)\{}
+  \ControlFlowTok{if}\NormalTok{ (x }\OperatorTok{%in%}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"never used"}\NormalTok{,}\StringTok{"used over a decade ago"}\NormalTok{,}\StringTok{"used in last decade"}\NormalTok{))\{}
+\NormalTok{    x =}\StringTok{ "never"}\NormalTok{\}}
+  \ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{ (x }\OperatorTok{%in%}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"used in last year"}\NormalTok{,}\StringTok{"used in last month"}\NormalTok{))\{}
+\NormalTok{    x =}\StringTok{ "occasionally"}\NormalTok{\}}
+  \ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{ (x }\OperatorTok{%in%}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"used in last week"}\NormalTok{,}\StringTok{"used in last day"}\NormalTok{))\{ }
+\NormalTok{    x =}\StringTok{ "regularly"}\NormalTok{\}}
+\NormalTok{  \}}
+
+\CommentTok{# Applying grouping function}
+\NormalTok{data2[consumption_variables] =}\StringTok{ }\KeywordTok{unlist}\NormalTok{(}\KeywordTok{lapply}\NormalTok{(data2[consumption_variables], }\ControlFlowTok{function}\NormalTok{(y) }\KeywordTok{lapply}\NormalTok{(y, fun)))}
+
+\CommentTok{# Modifying into factors}
+\NormalTok{data2[consumption_variables] =}\StringTok{ }\KeywordTok{lapply}\NormalTok{(data2[consumption_variables], }
+                                     \ControlFlowTok{function}\NormalTok{(x) }\KeywordTok{factor}\NormalTok{(x, }\DataTypeTok{levels =} \KeywordTok{c}\NormalTok{(}\StringTok{"never"}\NormalTok{,}\StringTok{"occasionally"}\NormalTok{,}\StringTok{"regularly"}\NormalTok{),}\DataTypeTok{ordered =} \OtherTok{TRUE}\NormalTok{))}
+
+\CommentTok{# Dropping "Consumption Chocolate" and "Consumption Caffeine" variables}
+\NormalTok{data2 =}\StringTok{ }\NormalTok{data2[,}\OperatorTok{-}\KeywordTok{c}\NormalTok{(}\DecValTok{14}\NormalTok{,}\DecValTok{16}\NormalTok{)]}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{personality-variables}{%
+\subsubsection{Personality Variables}\label{personality-variables}}
+
+Firstly, we decided to check whether personality variables have any
+outliers. To do that we looked at their ranges. Based on the table below
+we can establish that we do not have outliers.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{min_max =}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{14}\NormalTok{,}\DataTypeTok{nrow =} \DecValTok{7}\NormalTok{, }\DataTypeTok{ncol =} \DecValTok{2}\NormalTok{)}
+\KeywordTok{colnames}\NormalTok{(min_max) =}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"Minimum"}\NormalTok{, }\StringTok{"Maximum"}\NormalTok{)}
+\KeywordTok{rownames}\NormalTok{(min_max) =}\StringTok{ }\KeywordTok{names}\NormalTok{(}\KeywordTok{which}\NormalTok{(}\KeywordTok{sapply}\NormalTok{(data2,is.numeric)))}
+\NormalTok{min_max[,}\DecValTok{1}\NormalTok{] =}\StringTok{ }\KeywordTok{apply}\NormalTok{(data2[}\KeywordTok{names}\NormalTok{(}\KeywordTok{which}\NormalTok{(}\KeywordTok{sapply}\NormalTok{(data2,is.numeric)))],}\DecValTok{2}\NormalTok{, min)}
+\NormalTok{min_max[,}\DecValTok{2}\NormalTok{] =}\StringTok{ }\KeywordTok{apply}\NormalTok{(data2[}\KeywordTok{names}\NormalTok{(}\KeywordTok{which}\NormalTok{(}\KeywordTok{sapply}\NormalTok{(data2,is.numeric)))],}\DecValTok{2}\NormalTok{, max)}
+\KeywordTok{kable}\NormalTok{(min_max)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lrr@{}}
+\toprule
+& Minimum & Maximum\tabularnewline
+\midrule
+\endhead
+personality\_neuroticism & 0 & 100\tabularnewline
+personality\_extraversion & 0 & 100\tabularnewline
+personality\_openness & 0 & 100\tabularnewline
+personality\_agreeableness & 0 & 100\tabularnewline
+personality\_conscientiousness & 0 & 100\tabularnewline
+personality\_impulsiveness & 0 & 100\tabularnewline
+personality\_sensation & 0 & 100\tabularnewline
+\bottomrule
+\end{longtable}
+
+Knowing the fact that we do not have any irregularities we decided to
+aggregate this variables and create one called ``personality''. It aims
+to present the dominant character traits. The reason behind this
+decision is that we believe that these variables in continuous form are
+not reliable because people cannot establish real level of their
+personality traits. What it might be valuable from that data is its
+hierarchical order. So, we decided to check which personality trait had
+the highest score and we assigned it to personality variable.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data2[}\StringTok{"personality"}\NormalTok{] =}\StringTok{  }
+\StringTok{  }\KeywordTok{colnames}\NormalTok{(data2[}\KeywordTok{sapply}\NormalTok{(data2,is.numeric)])[}\KeywordTok{apply}\NormalTok{(data2[}\KeywordTok{sapply}\NormalTok{(data2,is.numeric)],}\DecValTok{1}\NormalTok{,which.max)]}
+
+\NormalTok{data2}\OperatorTok{$}\NormalTok{personality =}\StringTok{ }\KeywordTok{as.factor}\NormalTok{(data2}\OperatorTok{$}\NormalTok{personality)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{dependent-variable}{%
+\subsubsection{Dependent Variable}\label{dependent-variable}}
+
+We modified our dependent variable into factor. We also noticed that our
+dataset is strongly imbalanced. Thus, we decided to use upsampling in
+our analysis.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{kable}\NormalTok{(}\KeywordTok{table}\NormalTok{(data2}\OperatorTok{$}\NormalTok{consumption_cocaine_last_month))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule
+Var1 & Freq\tabularnewline
+\midrule
+\endhead
+No & 1373\tabularnewline
+Yes & 127\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data2}\OperatorTok{$}\NormalTok{consumption_cocaine_last_month =}\StringTok{ }\KeywordTok{factor}\NormalTok{(data2}\OperatorTok{$}\NormalTok{consumption_cocaine_last_month, }\DataTypeTok{levels =} \KeywordTok{c}\NormalTok{(}\StringTok{"No"}\NormalTok{,}\StringTok{"Yes"}\NormalTok{), }\DataTypeTok{ordered =} \OtherTok{TRUE}\NormalTok{)}
+
+\NormalTok{data2 =}\StringTok{ }\NormalTok{data2[}\KeywordTok{sapply}\NormalTok{(data2,is.factor)]}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{statistical-tests}{%
+\subsubsection{Statistical Tests}\label{statistical-tests}}
+
+To verify whether variables has a significant impact on cocaine
+consumption, we decided to run chi-squred tests. Based on the results we
+decided to drop the education variable because its p-value exceeded 5\%.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{chisqr =}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{,}\DataTypeTok{nrow =} \DecValTok{10}\NormalTok{, }\DataTypeTok{ncol =} \DecValTok{1}\NormalTok{)}
+\KeywordTok{colnames}\NormalTok{(chisqr) =}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"p-value"}\NormalTok{)}
+\KeywordTok{rownames}\NormalTok{(chisqr) =}\StringTok{ }\KeywordTok{names}\NormalTok{(}\KeywordTok{which}\NormalTok{(}\KeywordTok{sapply}\NormalTok{(data2,is.factor)))}
+\NormalTok{chisqr[,}\DecValTok{1}\NormalTok{] =}\StringTok{ }\KeywordTok{apply}\NormalTok{(data2[}\KeywordTok{names}\NormalTok{(}\KeywordTok{which}\NormalTok{(}\KeywordTok{sapply}\NormalTok{(data2,is.factor)))],}\DecValTok{2}\NormalTok{, }
+                   \ControlFlowTok{function}\NormalTok{(x) }\KeywordTok{round}\NormalTok{(}\KeywordTok{chisq.test}\NormalTok{(x, data2}\OperatorTok{$}\NormalTok{consumption_cocaine_last_month,}\DataTypeTok{correct=}\OtherTok{FALSE}\NormalTok{)}\OperatorTok{$}\NormalTok{p.value,}\DecValTok{4}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in chisq.test(x, data2$consumption_cocaine_last_month, correct = FALSE):
+## Chi-squared approximation may be incorrect
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{kable}\NormalTok{(chisqr)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule
+& p-value\tabularnewline
+\midrule
+\endhead
+age & 0.0000\tabularnewline
+gender & 0.0003\tabularnewline
+education & 0.0736\tabularnewline
+consumption\_alcohol & 0.0040\tabularnewline
+consumption\_amphetamines & 0.0000\tabularnewline
+consumption\_cannabis & 0.0000\tabularnewline
+consumption\_mushrooms & 0.0000\tabularnewline
+consumption\_nicotine & 0.0000\tabularnewline
+consumption\_cocaine\_last\_month & 0.0000\tabularnewline
+personality & 0.0000\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data2 =}\StringTok{ }\NormalTok{data2[,}\OperatorTok{-}\DecValTok{3}\NormalTok{]}
+\NormalTok{data2}\OperatorTok{$}\NormalTok{education}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## NULL
+\end{verbatim}
+
+\hypertarget{data-modelling}{%
+\subsection{Data Modelling}\label{data-modelling}}
+
+\hypertarget{algorithms-1}{%
+\subsubsection{Algorithms}\label{algorithms-1}}
+
+We decided that we are going to try to use 4 algorithms that are
+presented below:
+
+Logistic Regression
+
+KNN
+
+SVM
+
+Random Forest
+
+Each of the presented algorithms has its own benefits and drawbacks and
+this is the reason why we decided to go with all of them. We wanted to
+compare them and choose the most accurate for this dataset.
+
+\hypertarget{cross-validation}{%
+\subsubsection{Cross-Validation}\label{cross-validation}}
+
+Overfitting is one of the burdensome issue in Machine Learning. As we
+want to perform as accurate model as possible we needed to minimize that
+problem, so we decided to apply a Cross Validation procedure. Even
+though it is computationally expensive, we do not waste too much data
+which is extremely important in our case. Ultimately, we decided to go
+with five folds and three repeats. Additionally, as it was previously
+said, we used upsampling method.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{options}\NormalTok{(}\DataTypeTok{contrasts =} \KeywordTok{c}\NormalTok{(}\StringTok{"contr.treatment"}\NormalTok{,  }\CommentTok{# for non-ordinal factors}
+                      \StringTok{"contr.treatment"}\NormalTok{)) }\CommentTok{# for ordinal factors}
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{9432398}\NormalTok{) }\CommentTok{# We specify random seed}
+
+\CommentTok{# Train control with cross-validation}
+\NormalTok{ctrl_cv5 <-}\StringTok{ }\KeywordTok{trainControl}\NormalTok{(}\DataTypeTok{method =} \StringTok{"repeatedcv"}\NormalTok{,}
+                         \DataTypeTok{number =} \DecValTok{5}\NormalTok{,}
+                         \DataTypeTok{classProbs =} \OtherTok{TRUE}\NormalTok{,}
+                         \DataTypeTok{summaryFunction =}\NormalTok{ twoClassSummary,}
+                         \DataTypeTok{repeats =} \DecValTok{3}\NormalTok{)}
+
+\NormalTok{ctrl_cv5}\OperatorTok{$}\NormalTok{sampling =}\StringTok{ "up"}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{logistic-regression}{%
+\subsubsection{Logistic regression}\label{logistic-regression}}
+
+Our first algorithm was logistic regression. We decided start with it
+because it is easy method to implement, interpret, and very efficient to
+train. To increase the performance of the model we decided to add some
+interactions. We believed that the impact of the addictive substances
+might differ depending on people's character traits. We decided to go
+with the following variables, cannabis consumption, amphetamines
+consumption and mushrooms consumption, because they constitute so called
+soft and hard drugs. Thus, these three variables have been mixed with
+personality variable.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data2_logit_train1 <-}\StringTok{ }
+\StringTok{  }\KeywordTok{train}\NormalTok{(consumption_cocaine_last_month }\OperatorTok{~}\StringTok{ }\NormalTok{. }\OperatorTok{+}\StringTok{ }\NormalTok{personality}\OperatorTok{*}\NormalTok{consumption_amphetamines }
+        \OperatorTok{+}\StringTok{ }\NormalTok{personality}\OperatorTok{*}\NormalTok{consumption_cannabis }\OperatorTok{+}\StringTok{ }\NormalTok{personality}\OperatorTok{*}\NormalTok{consumption_cannabis,}
+        \DataTypeTok{data =}\NormalTok{ data2,        }
+        \DataTypeTok{method =} \StringTok{"glm"}\NormalTok{,}
+        \DataTypeTok{family =} \StringTok{"binomial"}\NormalTok{,}
+        \DataTypeTok{metric =} \StringTok{"ROC"}\NormalTok{,}
+        \DataTypeTok{trControl =}\NormalTok{ ctrl_cv5)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data2_logit_train1}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Generalized Linear Model 
+## 
+## 1500 samples
+##    8 predictor
+##    2 classes: 'No', 'Yes' 
+## 
+## No pre-processing
+## Resampling: Cross-Validated (5 fold, repeated 3 times) 
+## Summary of sample sizes: 1200, 1200, 1201, 1199, 1200, 1200, ... 
+## Addtional sampling using up-sampling
+## 
+## Resampling results:
+## 
+##   ROC        Sens       Spec     
+##   0.7395105  0.7263959  0.6876923
+\end{verbatim}
+
+We compared previous model to one which do not have any interactions to
+verify whether they improve our results. The results revaled that model
+do not differ significantly. Thus, we decided to stay with the last one.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data2_logit_train1 <-}\StringTok{ }
+\StringTok{  }\KeywordTok{train}\NormalTok{(consumption_cocaine_last_month }\OperatorTok{~}\StringTok{ }\NormalTok{.,}
+        \DataTypeTok{data =}\NormalTok{ data2,        }
+        \DataTypeTok{method =} \StringTok{"glm"}\NormalTok{,}
+        \DataTypeTok{family =} \StringTok{"binomial"}\NormalTok{,}
+        \DataTypeTok{metric =} \StringTok{"ROC"}\NormalTok{,}
+        \DataTypeTok{trControl =}\NormalTok{ ctrl_cv5)}
+
+\NormalTok{data2_logit_train1}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Generalized Linear Model 
+## 
+## 1500 samples
+##    8 predictor
+##    2 classes: 'No', 'Yes' 
+## 
+## No pre-processing
+## Resampling: Cross-Validated (5 fold, repeated 3 times) 
+## Summary of sample sizes: 1200, 1199, 1200, 1201, 1200, 1199, ... 
+## Addtional sampling using up-sampling
+## 
+## Resampling results:
+## 
+##   ROC       Sens       Spec     
+##   0.786158  0.7319779  0.7322051
+\end{verbatim}
+
+\hypertarget{knn-1}{%
+\subsubsection{KNN}\label{knn-1}}
+
+One of the biggest advantage of the KNN algorithm is its simplicity. It
+is quite intuitive method which simply finds K nearest neighbors.
+Unfortunately, this algorithm is vulnerable to uneven distribution of
+the explained variable. We believe that upsampling procedure we used
+might solve that problem.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{k_possible =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{k=}\KeywordTok{seq}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{20}\NormalTok{,}\DecValTok{1}\NormalTok{))}
+
+\NormalTok{data2_knn_train <-}\StringTok{ }
+\StringTok{  }\KeywordTok{train}\NormalTok{(consumption_cocaine_last_month }\OperatorTok{~}\StringTok{ }\NormalTok{.,}
+\NormalTok{        data2,        }
+        \DataTypeTok{method =} \StringTok{"knn"}\NormalTok{,}
+        \DataTypeTok{metric =} \StringTok{"ROC"}\NormalTok{,}
+        \DataTypeTok{trControl =}\NormalTok{ ctrl_cv5,}
+        \DataTypeTok{tuneGrid =}\NormalTok{ k_possible,}
+        \DataTypeTok{preProcess =} \KeywordTok{c}\NormalTok{(}\StringTok{"range"}\NormalTok{))}
+
+\NormalTok{data2_knn_train}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## k-Nearest Neighbors 
+## 
+## 1500 samples
+##    8 predictor
+##    2 classes: 'No', 'Yes' 
+## 
+## Pre-processing: re-scaling to [0, 1] (21) 
+## Resampling: Cross-Validated (5 fold, repeated 3 times) 
+## Summary of sample sizes: 1199, 1200, 1201, 1201, 1199, 1201, ... 
+## Addtional sampling using up-sampling prior to pre-processing
+## 
+## Resampling results across tuning parameters:
+## 
+##   k   ROC        Sens       Spec     
+##    1  0.6053419  0.8237293  0.3890256
+##    2  0.6300595  0.7542809  0.4944615
+##    3  0.6479507  0.7232170  0.5493333
+##    4  0.6698190  0.6994231  0.6016410
+##    5  0.6781217  0.6863190  0.6334359
+##    6  0.6835305  0.6744207  0.6225641
+##    7  0.6997335  0.6654413  0.6569231
+##    8  0.7123282  0.6579252  0.6777436
+##    9  0.7254701  0.6545198  0.6961026
+##   10  0.7213490  0.6484380  0.7064615
+##   11  0.7245934  0.6518407  0.6987692
+##   12  0.7309454  0.6477248  0.7117949
+##   13  0.7346690  0.6416607  0.7122051
+##   14  0.7325031  0.6474824  0.7090256
+##   15  0.7352533  0.6516027  0.7092308
+##   16  0.7415237  0.6615519  0.7041026
+##   17  0.7408137  0.6518434  0.7146667
+##   18  0.7478697  0.6593869  0.7224615
+##   19  0.7500525  0.6613068  0.6989744
+##   20  0.7578039  0.6683548  0.7381538
+## 
+## ROC was used to select the optimal model using the largest value.
+## The final value used for the model was k = 20.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(data2_knn_train)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{machine_learning_1_final_report_combined_files/figure-latex/knn_plot4-1.pdf}
+
+Based on the graph it we decided to go with k = 9.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data2_knn_train}\OperatorTok{$}\NormalTok{results}\OperatorTok{$}\NormalTok{k =}\StringTok{ }\DecValTok{9}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{svm}{%
+\subsubsection{SVM}\label{svm}}
+
+The main advantage of SVM algorithm is that we reduce the risk of
+overfitting. Moreover, the appropriate kernel function allows to solve
+any complex problem. However, it also has some disadvantages.
+Especially, it is difficult to tune proper hyper parameters, cost -C and
+gamma. We decided to go on with the parameters suggested by algorithm,
+sigma = 0.03044707 and C = 0.25.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{parametersC_sigma2 <-}\StringTok{ }
+\StringTok{  }\KeywordTok{expand.grid}\NormalTok{(}\DataTypeTok{C =} \KeywordTok{c}\NormalTok{(}\FloatTok{0.1}\NormalTok{,}\FloatTok{0.5}\NormalTok{,}\FloatTok{0.1}\NormalTok{),}
+              \DataTypeTok{sigma =} \KeywordTok{c}\NormalTok{(}\FloatTok{0.01}\NormalTok{,}\FloatTok{0.05}\NormalTok{,}\FloatTok{0.01}\NormalTok{))}
+
+\NormalTok{data2_svm_train <-}\StringTok{ }
+\StringTok{  }\KeywordTok{train}\NormalTok{(consumption_cocaine_last_month }\OperatorTok{~}\StringTok{ }\NormalTok{.,}
+\NormalTok{        data2,        }
+        \DataTypeTok{method =} \StringTok{"svmRadial"}\NormalTok{,}
+        \DataTypeTok{metric =} \StringTok{"ROC"}\NormalTok{,}
+        \DataTypeTok{trControl =}\NormalTok{ ctrl_cv5)}
+        \CommentTok{#tuneGrid = parametersC_sigma2)}
+
+\NormalTok{data2_svm_train}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Support Vector Machines with Radial Basis Function Kernel 
+## 
+## 1500 samples
+##    8 predictor
+##    2 classes: 'No', 'Yes' 
+## 
+## No pre-processing
+## Resampling: Cross-Validated (5 fold, repeated 3 times) 
+## Summary of sample sizes: 1199, 1200, 1201, 1200, 1200, 1199, ... 
+## Addtional sampling using up-sampling
+## 
+## Resampling results across tuning parameters:
+## 
+##   C     ROC        Sens       Spec     
+##   0.25  0.7819312  0.7800451  0.6586667
+##   0.50  0.7666103  0.7960770  0.5956923
+##   1.00  0.7579168  0.8205884  0.5375385
+## 
+## Tuning parameter 'sigma' was held constant at a value of 0.03044707
+## ROC was used to select the optimal model using the largest value.
+## The final values used for the model were sigma = 0.03044707 and C = 0.25.
+\end{verbatim}
+
+\hypertarget{random-forest}{%
+\subsubsection{Random Forest}\label{random-forest}}
+
+Additionally, we decided to try new algorithm that we did not have
+during our classes which was random forest. This method has a couple of
+advantages that previous ones did not have. Firstly, it is known that
+this algorithm is popular due to its accuracy. And this is a main reason
+why we decided to try it out. We believed that our dataset need precise
+method because it is imbalanced. Moreover, this method also solves the
+problem of overfitting. The important issue in this algorithm is to
+select proper number of variables randomly sampled as of candidates for
+each split. We can notice on the graph below that number two variables
+are characterized with the highest ROC value.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data2_rf_train <-}\StringTok{ }
+\StringTok{  }\KeywordTok{train}\NormalTok{(consumption_cocaine_last_month }\OperatorTok{~}\StringTok{ }\NormalTok{.,}
+\NormalTok{        data2,        }
+        \DataTypeTok{method =} \StringTok{"rf"}\NormalTok{,}
+        \DataTypeTok{metric =} \StringTok{"ROC"}\NormalTok{,}
+        \DataTypeTok{trControl =}\NormalTok{ ctrl_cv5)}
+
+\KeywordTok{plot}\NormalTok{(data2_rf_train)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{machine_learning_1_final_report_combined_files/figure-latex/rf2-1.pdf}
+
+\hypertarget{model-evaluation}{%
+\subsection{Model Evaluation}\label{model-evaluation}}
+
+In order to choose our final model we decided to run predictions on the
+whole dataset using all algorithms. We used parameters that were
+selected in our previous steps. We also decided to choose Balanced
+Accuracy as our final index to evaluate accuracy of our model.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{logit_fitted =}\StringTok{ }\KeywordTok{predict}\NormalTok{(data2_logit_train1, data2)}
+\NormalTok{logit_results =}\StringTok{ }\KeywordTok{summary_binary_class}\NormalTok{(}\DataTypeTok{predicted_classes =}\NormalTok{ logit_fitted,}
+                     \DataTypeTok{real =}\NormalTok{ data2}\OperatorTok{$}\NormalTok{consumption_cocaine_last_month)}
+
+\NormalTok{knn_fitted =}\StringTok{ }\KeywordTok{predict}\NormalTok{(data2_knn_train, data2)}
+\NormalTok{knn_results =}\StringTok{ }\KeywordTok{summary_binary_class}\NormalTok{(}\DataTypeTok{predicted_classes =}\NormalTok{ knn_fitted,}
+                     \DataTypeTok{real =}\NormalTok{ data2}\OperatorTok{$}\NormalTok{consumption_cocaine_last_month)}
+
+\NormalTok{svm_fitted =}\StringTok{ }\KeywordTok{predict}\NormalTok{(data2_svm_train, data2)}
+\NormalTok{svm_results =}\StringTok{ }\KeywordTok{summary_binary_class}\NormalTok{(}\DataTypeTok{predicted_classes =}\NormalTok{ svm_fitted,}
+                     \DataTypeTok{real =}\NormalTok{ data2}\OperatorTok{$}\NormalTok{consumption_cocaine_last_month)}
+
+\NormalTok{rf_fitted =}\StringTok{ }\KeywordTok{predict}\NormalTok{(data2_rf_train, data2)}
+\NormalTok{rf_results =}\StringTok{ }\KeywordTok{summary_binary_class}\NormalTok{(}\DataTypeTok{predicted_classes =}\NormalTok{ rf_fitted,}
+                     \DataTypeTok{real =}\NormalTok{ data2}\OperatorTok{$}\NormalTok{consumption_cocaine_last_month)}
+
+\NormalTok{balanced_accuracy  =}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{4}\NormalTok{, }\DataTypeTok{nrow=}\DecValTok{1}\NormalTok{, }\DataTypeTok{ncol=}\DecValTok{4}\NormalTok{)}
+
+\NormalTok{balanced_accuracy[}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{]=}\KeywordTok{confusionMatrix}\NormalTok{(}\KeywordTok{as.factor}\NormalTok{(logit_fitted), data2}\OperatorTok{$}\NormalTok{consumption_cocaine_last_month)}\OperatorTok{$}\NormalTok{byClass[}\DecValTok{11}\NormalTok{]}
+\NormalTok{balanced_accuracy[}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{]=}\KeywordTok{confusionMatrix}\NormalTok{(}\KeywordTok{as.factor}\NormalTok{(knn_fitted), data2}\OperatorTok{$}\NormalTok{consumption_cocaine_last_month)}\OperatorTok{$}\NormalTok{byClass[}\DecValTok{11}\NormalTok{]}
+\NormalTok{balanced_accuracy[}\DecValTok{1}\NormalTok{,}\DecValTok{3}\NormalTok{]=}\KeywordTok{confusionMatrix}\NormalTok{(}\KeywordTok{as.factor}\NormalTok{(svm_fitted), data2}\OperatorTok{$}\NormalTok{consumption_cocaine_last_month)}\OperatorTok{$}\NormalTok{byClass[}\DecValTok{11}\NormalTok{]}
+\NormalTok{balanced_accuracy[}\DecValTok{1}\NormalTok{,}\DecValTok{4}\NormalTok{]=}\KeywordTok{confusionMatrix}\NormalTok{(}\KeywordTok{as.factor}\NormalTok{(rf_fitted), data2}\OperatorTok{$}\NormalTok{consumption_cocaine_last_month)}\OperatorTok{$}\NormalTok{byClass[}\DecValTok{11}\NormalTok{]}
+
+\KeywordTok{colnames}\NormalTok{(balanced_accuracy) =}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"Logit"}\NormalTok{,}\StringTok{"KNN"}\NormalTok{,}\StringTok{"SVM"}\NormalTok{,}\StringTok{"Random Forest"}\NormalTok{)}
+\KeywordTok{rownames}\NormalTok{(balanced_accuracy) =}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"Balanced Accuracy"}\NormalTok{)}
+\KeywordTok{kable}\NormalTok{(balanced_accuracy)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lrrrr@{}}
+\toprule
+& Logit & KNN & SVM & Random Forest\tabularnewline
+\midrule
+\endhead
+Balanced Accuracy & 0.7685854 & 0.7515585 & 0.8160847 &
+0.8303961\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{print}\NormalTok{(}\KeywordTok{paste0}\NormalTok{(}\StringTok{'The best algorithm for our dataset is '}\NormalTok{, }\KeywordTok{colnames}\NormalTok{(balanced_accuracy)[}\KeywordTok{apply}\NormalTok{(balanced_accuracy,}\DecValTok{1}\NormalTok{,which.max)],}
+             \StringTok{' with the predicted Balanced Accuracy equals to '}\NormalTok{, }\KeywordTok{round}\NormalTok{(balanced_accuracy[}\KeywordTok{apply}\NormalTok{(balanced_accuracy,}\DecValTok{1}\NormalTok{,which.max)]}\OperatorTok{*}\DecValTok{100}\NormalTok{,}\DecValTok{2}\NormalTok{),}\StringTok{'%'}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "The best algorithm for our dataset is Random Forest with the predicted Balanced Accuracy equals to 83.04%"
+\end{verbatim}
+
+\end{document}

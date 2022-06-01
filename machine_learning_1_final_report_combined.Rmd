@@ -1,16 +1,19 @@
 
 
 ---
-title: 'Machine Learning I - Regression - Presentation'
-author: <font size=5><b>- Mateusz Domaradzki & Karol Ziolo</b></font>
-output: 
+title: "Machine Learning I - Regression - Presentation"
+author: "<font size=5><b>- Mateusz Domaradzki & Karol Ziolo</b></font>"
+output:
   html_document:
-    toc: true # table of content true
-    keep_md: true
-    toc_depth: 3  # upto three depths of headings (specified by #, ## and ###)
-    toc_float: TRUE
+    toc: yes
+    keep_md: yes
+    toc_depth: 3
+    toc_float: yes
     theme: united
     highlight: tango
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
 ---
 
 ![<font size=5> <b> University of Warsaw - Faculty of Economic Sciences </b></font>](image.jpg)
@@ -587,7 +590,7 @@ this one may be really relevant player. We will see at the end in the comparison
 
 <font size=4> Once again i experimented between different values of K for KNN and I decided to go with 19 </font>
 
-```{r KNN1}
+```{r KNN1, message=FALSE}
 ctrl_cv5 <- trainControl(method = "cv",
                          number = 5)
 
