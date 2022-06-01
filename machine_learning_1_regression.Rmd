@@ -326,8 +326,6 @@ data2 = data2[,-1]
 
 ```{r age2}
 
-kable(table(data2$age))
-
 data2$age[data2$age=="55-64"] <- "55+"
 data2$age[data2$age == "65+"] <- "55+"
 
@@ -358,8 +356,6 @@ data2$gender = factor(data2$gender, levels = c("male","female"), ordered = TRUE)
 
 ```{r education2}
 
-kable(table(data2$education))
-
 data2$education[data2$education %in% c("Left school before 16 years",
                                        "Left school at 16 years",
                                        "Left school at 17 years",
@@ -384,8 +380,6 @@ data2$education <- droplevels(data2$education)
 
 ```{r country2}
 
-kable(table(data2$country))
-
 data2$country[data2$country %in% c("Canada","Ireland")] <- "Other"
 
 ```
@@ -400,7 +394,6 @@ data2$country[data2$country %in% c("Canada","Ireland")] <- "Other"
 
 ```{r ethnicity2, message=FALSE, include = FALSE}
 
-kable(table(data2$ethnicity))
 data2 = data2[,-5]
 
 ```
@@ -409,7 +402,7 @@ data2 = data2[,-5]
 
 ### Consumption
 
-<font size=4> We decided to downgrade consumption variables into three groups: "regularly", "occasionally" and "never". We also consider that "Consumption Chocolate" and "Consumption Caffeine" do not have any direct impact whether person consumes cocaine so we decided to drop them from our dataset.  </font>
+<font size=4> We decided to downgrade consumption variables into three groups: "regularly", "occasionally" and "never". We also dropped "Consumption Chocolate" and "Consumption Caffeine".  </font>
 
 <br>
 
@@ -446,7 +439,7 @@ data2 = data2[,-c(14,16)]
 
 ### Personality Variables
 
-<font size=4> The table below we confirms that we do not have outliers. </font>
+<font size=4> Checking for outliers. </font>
 
 <br>
 
@@ -480,8 +473,6 @@ data2$personality = as.factor(data2$personality)
 
 ### Dependent Variable
 
-<font size=4>We modified our dependent variable into factor. We also noticed that our dataset is strongly imbalanced. Thus, we decided to use upsampling in our analysis. </font>
-
 ```{r dependent2}
 
 kable(table(data2$consumption_cocaine_last_month))
@@ -495,8 +486,6 @@ data2 = data2[sapply(data2,is.factor)]
 <br>
 
 ### Statistical Tests
-
-<font size=4>To verify whether variables has a significant impact on cocaine consumption, we decided to run chi-squred tests.</font>
 
 ```{r chisqr2, message=False}
 
@@ -556,5 +545,5 @@ kable(balanced_accuracy)
 
 ```
 
-
+<font size=5><b> Our expected Balanced Accuracy for test dataset equals 83.04%</b></font>
 
