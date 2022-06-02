@@ -1,7 +1,7 @@
 
 
 ---
-title: "Machine Learning I - Regression - Presentation"
+title: "Machine Learning I - Regression - Final Raport"
 author: "<font size=5><b>- Mateusz Domaradzki & Karol Ziolo</b></font>"
 output:
   html_document:
