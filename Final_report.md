@@ -77,7 +77,7 @@ data[which(duplicated(data)),]
 <font size=4> Not really so we can move forward and check pattern in time </font>
 
 <br>
-![](machine_learning_1_final_report_combined_files/figure-html/pattern_date-1.png)<!-- -->
+![](Final_report_files/figure-html/pattern_date-1.png)<!-- -->
 <br>
 
 
@@ -121,7 +121,7 @@ time_of_the_day<-function(x) {
 }
 ```
 
-![](machine_learning_1_final_report_combined_files/figure-html/pattern_date2-1.png)<!-- -->
+![](Final_report_files/figure-html/pattern_date2-1.png)<!-- -->
 <br>
 <br>
 <font size=4> let's apply the function </font>
@@ -315,11 +315,11 @@ Also I dropped an outlier from rain (I believe that is an ouliter) </font>
 
 <br>
 
-![](machine_learning_1_final_report_combined_files/figure-html/ggplot-1.png)<!-- -->
+![](Final_report_files/figure-html/ggplot-1.png)<!-- -->
 
 <br>
 
-![](machine_learning_1_final_report_combined_files/figure-html/ggplot2-1.png)<!-- -->
+![](Final_report_files/figure-html/ggplot2-1.png)<!-- -->
 
 <br>
 
@@ -341,7 +341,7 @@ season_of_the_year <- function(x) {
 
 day_of_the_wk<- function(x) {
   result<-list()
-  if(x=='sobota' || x=='niedziela'){
+  if(x=='Saturday' || x=='Sunday'){
     result<-"Weekend"
   } 
   else{
@@ -642,7 +642,7 @@ traffic_predicted2 <- predict(traffic_lm2)
 <font size=4> let's plot real vs predicted values </font>
 
 <br>
-![](machine_learning_1_final_report_combined_files/figure-html/olsplot-1.png)![](machine_learning_1_final_report_combined_files/figure-html/olsplot-2.png)
+![](Final_report_files/figure-html/olsplot-1.png)![](Final_report_files/figure-html/olsplot-2.png)
 
 ### Lasso/Ridge/Elastic approach
 
@@ -754,7 +754,7 @@ and alpha=0.2 with lambda = 2 </font>
 
 <br>
 
-![](machine_learning_1_final_report_combined_files/figure-html/elastic_plot-1.png)<!-- -->
+![](Final_report_files/figure-html/elastic_plot-1.png)<!-- -->
 
 <br>
 
@@ -1217,7 +1217,7 @@ traffic_knn <-
 ##  - attr(*, "validate")= logi TRUE
 ```
 
-![](machine_learning_1_final_report_combined_files/figure-html/elastic_plot_knn-1.png)<!-- -->
+![](Final_report_files/figure-html/elastic_plot_knn-1.png)<!-- -->
 
 ### SVR 
 
@@ -1257,8 +1257,8 @@ svm_Radial2
 ## Summary of sample sizes: 23750, 23751, 23748, 23750, 23749 
 ## Resampling results:
 ## 
-##   RMSE      Rsquared   MAE    
-##   1061.182  0.7274503  776.963
+##   RMSE      Rsquared   MAE     
+##   1061.184  0.7274451  776.9671
 ## 
 ## Tuning parameter 'sigma' was held constant at a value of 0.1
 ## Tuning
@@ -1266,7 +1266,7 @@ svm_Radial2
 ```
 <br>
 
-![](machine_learning_1_final_report_combined_files/figure-html/elastic_plot_svr-1.png)<!-- -->
+![](Final_report_files/figure-html/elastic_plot_svr-1.png)<!-- -->
 <br>
 
 ## MAPE between all algorithms
@@ -1319,7 +1319,7 @@ kable(MAPE)
 |                 |                      |                 |                 |
 |:----------------|:---------------------|:----------------|:----------------|
 |predicted_ols    |predicted_lasso_ridge |predicted_svr    |predicted_knn    |
-|2.54102929907404 |2.52030263951233      |2.16979313569393 |2.31690349181668 |
+|2.54102929907403 |2.52030263951234      |2.16968344065528 |2.31690349181668 |
 <br>
 
 <font size=4>So SVR, then KNN are performing the best. I think it's rather data-depended which one should we chose </font>
@@ -1386,10 +1386,7 @@ kable(colSums(is.na(data2)) %>%
 |consumption_cocaine_last_month |  0|
 <br>
 
-<font size=4> We do not have any NAs thus we can move forward and check which variables are characters. </font>
-
-<br>
-
+<font size=4> We do not have any NAs, thus we can move forward and check which variable is character. </font>
 
 
 ```r
@@ -1425,17 +1422,16 @@ kable(sapply(data2, is.character))
 ```r
 data2 = data2[,-1]
 ```
-<br>
 
-<font size=4> We have noticed that there is an ID column which we decided to drop because it is not valuable for us. </font>
+<font size=4> We have noticed that there is an ID column. We decided to drop it because it does not provide any valuable information. </font>
 
 <br>
 
 ### Age
 
-<font size=4> As it is presented below people were divided into six age groups. However, we have noticed that its distribution is slightly imbalanced. Thus, we decided to merge groups "55-64" and "65+" into one group called "55+" to be more representative. </font>
-
 <br>
+
+<font size=4> As it is presented below people were divided into six age groups. However, we have noticed that its distribution is slightly imbalanced. Thus, we decided to merge groups "55-64" and "65+" into one group called "55+" to be more representative. </font>
 
 
 ```r
@@ -1467,9 +1463,9 @@ data2$age <- droplevels(data2$age)
 ```
 ### Gender
 
-<font size=4> As of Gender variable we modified it into factors. </font>
-
 <br>
+
+<font size=4> We modified Gender variable into factors. </font>
 
 
 ```r
@@ -1480,9 +1476,9 @@ data2$gender = factor(data2$gender, levels = c("male","female"), ordered = TRUE)
 
 ### Education
 
-<font size=4> The education variable is divided into many levels, which again is not distributed evenly. We have many disproportions so we decided to merge people who left school at or before 18 into one group. </font>
-
 <br>
+
+<font size=4> The education variable is divided into many levels, which again is not distributed evenly. We have many disproportions so we decided to merge people who left school at or before 18 into one group. </font>
 
 
 ```r
@@ -1521,9 +1517,9 @@ data2$education <- droplevels(data2$education)
 
 ### Country
 
-<font size=4> As for the country variable we have noticed that most people are from Australia or USA. However, there is small number of people from Canada and Ireland so we decided to assign them to the group of others. </font>
-
 <br>
+
+<font size=4> As for the country variable we have noticed that most people are from Australia or USA. However, there is small number of people from Canada and Ireland so we decided to assign them to the group of others. </font>
 
 
 ```r
@@ -1550,9 +1546,9 @@ data2$country[data2$country %in% c("Canada","Ireland")] <- "Other"
 
 ### Ethnicity
 
-<font size=4> We checked the Ethnicity variable and we have noticed that sample is practically homogeneous. Thus, we decided to drop it because it does not provide any reliable information regarding other ethnic groups. </font>
-
 <br>
+
+<font size=4> We checked the Ethnicity variable and we have noticed that sample is practically homogeneous. Thus, we decided to drop it because it does not provide any reliable information regarding other ethnic groups. </font>
 
 
 ```r
@@ -1579,9 +1575,9 @@ data2 = data2[,-5]
 
 ### Consumption
 
-<font size=4> We believe that variables that concern consumption should be grouped because the frequency split is too broad. It was decided to downgrade it into three groups: "regularly", "occasionally" and "never". We also consider that "Consumption Chocolate" and "Consumption Caffeine" do not have any direct impact whether person consumes cocaine so we decided to drop them from our dataset.  </font>
-
 <br>
+
+<font size=4> We believe that variables that concern consumption should be grouped because the frequency split is too broad. It was decided to downgrade it into three groups: "regularly", "occasionally" and "never". We also consider that "Consumption Chocolate" and "Consumption Caffeine" do not have any direct impact whether person consumes cocaine so we decided to drop them from our dataset.  </font>
 
 
 ```r
@@ -1615,9 +1611,9 @@ data2 = data2[,-c(14,16)]
 
 ### Personality Variables
 
-<font size=4> Firstly, we decided to check whether personality variables have any outliers. To do that we looked at their ranges. Based on the table below we can establish that we do not have outliers. </font>
-
 <br>
+
+<font size=4> Firstly, we decided to check whether personality variables have any outliers. To do that we looked at their ranges. Based on the table below we can establish that we do not have outliers. </font>
 
 
 ```r
@@ -1645,8 +1641,6 @@ kable(min_max)
 
 <font size=4> Knowing the fact that we do not have any irregularities we decided to aggregate this variables and create one called "personality". It aims to present the dominant character traits. The reason behind this decision is that we believe that these variables in continuous form are not reliable because people cannot establish real level of their personality traits. What it might be valuable from that data is its hierarchical order. So, we decided to check which personality trait had the highest score and we assigned it to personality variable. </font>
 
-<br>
-
 
 ```r
 data2["personality"] =  
@@ -1658,6 +1652,8 @@ data2$personality = as.factor(data2$personality)
 <br>
 
 ### Dependent Variable
+
+<br>
 
 <font size=4>We modified our dependent variable into factor. We also noticed that our dataset is strongly imbalanced. Thus, we decided to use upsampling in our analysis. </font>
 
@@ -1683,7 +1679,9 @@ data2 = data2[sapply(data2,is.factor)]
 
 ### Statistical Tests
 
-<font size=4>To verify whether variables has a significant impact on cocaine consumption, we decided to run chi-squred tests. Based on the results we decided to drop the education variable because its p-value exceeded 5%.</font>
+<br>
+
+<font size=4>To verify whether variables has a significant impact on the cocaine consumption, we decided to run chi-squred tests. Based on the results we decided to drop the education variable because its p-value exceeded 5%.</font>
 
 
 ```r
@@ -1692,14 +1690,7 @@ colnames(chisqr) = c("p-value")
 rownames(chisqr) = names(which(sapply(data2,is.factor)))
 chisqr[,1] = apply(data2[names(which(sapply(data2,is.factor)))],2, 
                    function(x) round(chisq.test(x, data2$consumption_cocaine_last_month,correct=FALSE)$p.value,4))
-```
 
-```
-## Warning in chisq.test(x, data2$consumption_cocaine_last_month, correct = FALSE):
-## Chi-squared approximation may be incorrect
-```
-
-```r
 kable(chisqr)
 ```
 
@@ -1720,11 +1711,6 @@ kable(chisqr)
 
 ```r
 data2 = data2[,-3]
-data2$education
-```
-
-```
-## NULL
 ```
 
 <br>
@@ -1742,15 +1728,15 @@ data2$education
   <li>Logistic Regression </li> 
   <li>KNN </li>
   <li>SVM </li>
-  <li>Random Forest </li>
+  <li>Random Forest (additionally, out of curiosity)</li>
 </ul> 
 </font>
-
-<br>
 
 <font size=4>Each of the presented algorithms has its own benefits and drawbacks and this is the reason why we decided to go with all of them. We wanted to compare them and choose the most accurate for this dataset. </font>
 
 ### Cross-Validation
+
+<br>
 
 <font size=4>Overfitting is one of the burdensome issue in Machine Learning. As we want to perform as accurate model as possible we needed to minimize that problem, so we decided to apply a Cross Validation procedure. Even though it is computationally expensive, we do not waste too much data which is extremely important in our case. Ultimately, we decided to go with five folds and three repeats. Additionally, as it was previously said, we used upsampling method.</font>
 
@@ -1774,10 +1760,9 @@ ctrl_cv5$sampling = "up"
 
 ### Logistic regression
 
-<font size=4> Our first algorithm was logistic regression. We decided start with it because it is easy method to implement, interpret, and very efficient to train. To increase the performance of the model we decided to add some interactions. We believed that the impact of the addictive substances might differ depending on people's character traits. We decided to go with the following variables, cannabis consumption, amphetamines consumption and mushrooms consumption, because they constitute so called soft and hard drugs. Thus, these three variables have been mixed with personality variable. </font>
-
 <br>
 
+<font size=4> Our first algorithm was logistic regression. We decided start with it because it is easy method to implement, interpret, and it is very efficient to train. To increase the performance of the model we decided to add some interactions. We believed that the impact of the addictive substances might differ depending on people's character traits. We decided to go with the following variables, cannabis consumption, amphetamines consumption and mushrooms consumption, because they constitute so called soft and hard drugs. Thus, these three variables have been mixed with personality variable. </font>
 
 
 ```r
@@ -1789,31 +1774,7 @@ data2_logit_train1 <-
         family = "binomial",
         metric = "ROC",
         trControl = ctrl_cv5)
-```
 
-```
-## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
-
-## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
-
-## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
-
-## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
-
-## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
-
-## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
-
-## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
-
-## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
-
-## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
-
-## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
-```
-
-```r
 data2_logit_train1
 ```
 
@@ -1837,7 +1798,7 @@ data2_logit_train1
 
 <br>
 
-<font size=4>We compared previous model to one which do not have any interactions to verify whether they improve our results. The results revaled that model do not differ significantly. Thus, we decided to stay with the last one.</font>
+<font size=4>We compared previous model to one which do not have any interactions to verify whether they improve our results. They revealed that model do not differ significantly. Thus, we decided to stay with the last, more simple one.</font>
 
 
 ```r
@@ -1874,7 +1835,7 @@ data2_logit_train1
 
 ### KNN
 
-<font size=4>One of the biggest advantage of the KNN algorithm is its simplicity. It is quite intuitive method which simply finds K nearest neighbors. Unfortunately, this algorithm is vulnerable to uneven distribution of the explained variable. We believe that upsampling procedure we used might solve that problem.</font>
+<font size=4>One of the biggest advantage of the KNN algorithm is its simplicity. It is quite intuitive method which simply finds K nearest neighbors. Unfortunately, this algorithm is vulnerable to uneven distribution of explained variable. We believe that upsampling procedure we used might solve that problem.</font>
 
 <br>
 
@@ -1941,13 +1902,12 @@ data2_knn_train
 plot(data2_knn_train)
 ```
 
-![](machine_learning_1_final_report_combined_files/figure-html/knn_plot4-1.png)<!-- -->
+![](Final_report_files/figure-html/knn_plot4-1.png)<!-- -->
 
 <br>
 
 <font size=4>Based on the graph it we decided to go with k = 9.</font>
 
-<br>
 
 
 ```r
@@ -1956,21 +1916,21 @@ data2_knn_train$results$k = 9
 
 ### SVM
 
-<font size=4>The main advantage of SVM algorithm is that we reduce the risk of overfitting. Moreover, the  appropriate kernel function allows to solve any complex problem. However, it also has some disadvantages. Especially, it is difficult to tune proper hyper parameters, cost -C and gamma. We decided to go on with the parameters suggested by algorithm, sigma = 0.03044707 and C = 0.25. </font>
+<font size=4>The main advantage of SVM algorithm is that we reduce the risk of overfitting. Moreover, the  appropriate kernel function allows to solve any complex problem. However, it also has some disadvantages. Especially, it is difficult to tune proper hyper parameters, cost -C and gamma. In our case we decided to go on with the following parameters, sigma = 0.031 and C = 0.25. </font>
 
 
 ```r
 parametersC_sigma2 <- 
-  expand.grid(C = c(0.1,0.5,0.1),
-              sigma = c(0.01,0.05,0.01))
+  expand.grid(C = c(0.25),
+              sigma = c(0.031))
 
 data2_svm_train <- 
   train(consumption_cocaine_last_month ~ .,
         data2,        
         method = "svmRadial",
         metric = "ROC",
-        trControl = ctrl_cv5)
-        #tuneGrid = parametersC_sigma2)
+        trControl = ctrl_cv5,
+        tuneGrid = parametersC_sigma2)
 
 data2_svm_train
 ```
@@ -1987,16 +1947,14 @@ data2_svm_train
 ## Summary of sample sizes: 1199, 1200, 1201, 1200, 1200, 1199, ... 
 ## Addtional sampling using up-sampling
 ## 
-## Resampling results across tuning parameters:
+## Resampling results:
 ## 
-##   C     ROC        Sens       Spec     
-##   0.25  0.7819312  0.7800451  0.6586667
-##   0.50  0.7666103  0.7960770  0.5956923
-##   1.00  0.7579168  0.8205884  0.5375385
+##   ROC        Sens       Spec     
+##   0.7811567  0.7751913  0.6615385
 ## 
-## Tuning parameter 'sigma' was held constant at a value of 0.03044707
-## ROC was used to select the optimal model using the largest value.
-## The final values used for the model were sigma = 0.03044707 and C = 0.25.
+## Tuning parameter 'sigma' was held constant at a value of 0.031
+## Tuning
+##  parameter 'C' was held constant at a value of 0.25
 ```
 
 <br>
@@ -2004,7 +1962,7 @@ data2_svm_train
 ### Random Forest
 
 <font size=4>Additionally, we decided to try new algorithm that we did not have during our classes which was random forest. This method has a couple of advantages that previous ones did not have. Firstly, it is known that this algorithm is popular due to its accuracy. And this is a main reason why we decided to try it out. We believed that our dataset need precise method because it is imbalanced. Moreover, this method also solves the problem of overfitting. 
-The important issue in this algorithm is to select proper number of variables randomly sampled as of candidates for each split. We can notice on the graph below that number two variables are characterized with the highest ROC value.</font>
+The important issue in this algorithm is to select proper number of variables as of candidates for each split. We can notice on the graph below that number two variables are characterized with the highest ROC value.</font>
 
 <br>
 
@@ -2020,9 +1978,11 @@ data2_rf_train <-
 plot(data2_rf_train)
 ```
 
-![](machine_learning_1_final_report_combined_files/figure-html/rf2-1.png)<!-- -->
+![](Final_report_files/figure-html/rf2-1.png)<!-- -->
 
 ## Model Evaluation
+
+<br>
 
 <font size=4>In order to choose our final model we decided to run predictions on the whole dataset using all algorithms. We used parameters that were selected in our previous steps. We also decided to choose Balanced Accuracy as our final index to evaluate accuracy of our model. </font>
 
@@ -2060,7 +2020,7 @@ kable(balanced_accuracy)
 
 |                  |     Logit|       KNN|       SVM| Random Forest|
 |:-----------------|---------:|---------:|---------:|-------------:|
-|Balanced Accuracy | 0.7685854| 0.7515585| 0.8160847|     0.8303961|
+|Balanced Accuracy | 0.7685854| 0.7519226| 0.8077777|     0.8351303|
 
 ```r
 print(paste0('The best algorithm for our dataset is ', colnames(balanced_accuracy)[apply(balanced_accuracy,1,which.max)],
@@ -2068,5 +2028,8 @@ print(paste0('The best algorithm for our dataset is ', colnames(balanced_accurac
 ```
 
 ```
-## [1] "The best algorithm for our dataset is Random Forest with the predicted Balanced Accuracy equals to 83.04%"
+## [1] "The best algorithm for our dataset is Random Forest with the predicted Balanced Accuracy equals to 83.51%"
 ```
+
+<font size=4> Even though the highest Balanced Accuracy was performed by Random Forest, ultimately we decided to go with SVM method. </font>
+

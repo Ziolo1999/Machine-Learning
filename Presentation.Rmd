@@ -1,0 +1,629 @@
+
+
+---
+title: "Machine Learning I - Regression - Presentation"
+author: "<font size=5><b>- Mateusz Domaradzki&Karol Ziolo</b></font>"
+output:
+  html_document:
+    toc: yes
+    keep_md: yes
+    toc_depth: 3
+    toc_float: yes
+    theme: united
+    highlight: tango
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+![<font size=5> <b> University of Warsaw - Faculty of Economic Sciences </b></font>](image.jpg)
+<br>
+<br><br>
+<br><br>
+<br><br>
+
+
+# Regression
+
+<br><br>
+
+## Data Preparation
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r biblioteki, message=FALSE, include = FALSE}
+library(knitr)
+library(readxl)
+library(dplyr)
+library(readr)
+library(ggplot2)
+library(zoo)
+library(class)
+library(kernlab)
+library(verification)
+library(ggplot2)
+library(tidyverse)
+library(caret)
+library(MLmetrics)
+```
+
+```{r, data, echo=FALSE, message=FALSE, include=FALSE}
+data <- read.csv("Regression/traffic_train.csv")
+```
+```{r, data1,echo=FALSE, message=FALSE, include = FALSE}
+## We decode data into interesting parts for us
+data$date_time <- as.POSIXct(data$date_time, format = "%Y-%m-%d %H:%M:%S")
+## We will check later if quarter, according to our intuition is relevant
+yq <- as.yearqtr(data$date_time, format = "%Y-%m-%d %H:%M:%S")
+data$kwartal<-format(yq, format = "%q")
+## Hour is for sure relevant for the traffic
+data$hour<-format(data$date_time, format='%H')
+data$hour<-as.numeric(data$hour)
+
+## Due to our transformation we receive 3 NAs but it shouldnt be relevant so we just drop them
+data[which(is.na(data$date_time)),]
+data<-na.omit(data)
+```
+
+```{r, Weather, echo=FALSE, message=FALSE, include=FALSE}
+## We decode data into interesting parts for us
+data$date_time <- as.POSIXct(data$date_time, format = "%Y-%m-%d %H:%M:%S")
+## We will check later if quarter, according to our intuition is relevant
+yq <- as.yearqtr(data$date_time, format = "%Y-%m-%d %H:%M:%S")
+data$kwartal<-format(yq, format = "%q")
+## Hour is for sure relevant for the traffic
+data$hour<-format(data$date_time, format='%H')
+data$hour<-as.numeric(data$hour)
+## Due to our transformation we receive 3 NAs but it shouldnt be relevant so we just drop them
+data[which(is.na(data$date_time)),]
+data<-na.omit(data)
+##outliers
+table(data$temperature)
+data<-data[-c(which(data$temperature==-273.1)),]
+
+data<-data[-c(which(data$rain_mm>100)),]
+```
+<br>
+
+### Weather
+
+<br>
+
+<font size=5>We decided to use only weather_general, without detailed version of it. Thus, we merged some of the levels</font>
+
+```{r, Weather2}
+
+data$weather_general <- as.factor(data$weather_general)
+
+data$weather_general[data$weather_general == "Maze"] <- "Fog"
+data$weather_general[data$weather_general == "Haze"] <- "Smoke"
+data$weather_general[data$weather_general == "Squall"] <- "Thunderstorm"
+```
+
+
+```{r, Weather3, echo=FALSE, MESSAGE=FALSE}
+data$weather_general <- droplevels(data$weather_general)
+a<-kable(table(data$weather_general))
+
+a[[1]]<-"|Variable     |  Frequency|"
+
+a
+```
+<br>
+
+
+### Our transformations
+
+<br>
+<font size=5>Using barplots we noticed that the hour is highly correlated with the level of traffic</font>
+<br>
+
+```{r, Data_godzina}
+time_of_the_day<-function(x) {
+  result<-list()
+  if(x>=6 & x<=8){
+    result<-"Traffic_morning_peak_hour"
+  } 
+  else if(x>8 & x<15){
+    result<-"Working_hours"}
+  else if(x>=15 & x<=17){
+    result<-"Traffic_evening_peak_hour"}
+  else{
+    result <-"night"}
+  return(result)
+}
+```
+<br>
+
+<font size=5>Also the season matters in interactions</font>
+
+```{r, season}
+
+season_of_the_year <- function(x) {
+  result<-list()
+  if(x=='11' || x=='12' || x=='01'){
+    result<-"Winter"
+  } 
+  else if(x=='07' || x=='08' || x=='09' ){
+    result<-"Summer_Holidays"}
+  else{
+    result <-"The_Rest_of_the_season"}
+  return(result)
+}
+
+```
+<br>
+
+<font size=5>The day of the week is also an important factor</font>
+
+
+```{r, day_of_week}
+
+day_of_the_wk<- function(x) {
+  result<-list()
+  if(x=='sobota' || x=='niedziela'){
+    result<-"Weekend"
+  } 
+  else{
+    result <-"Working_day"}
+  return(result)
+}
+
+```
+<br>
+
+
+
+```{r, datatransofrm, echo=FALSE, message=FALSE, include=FALSE}
+data$month<-format(data$date_time, format='%m')
+data$day<-weekdays(data$date_time)
+
+data$season<-lapply(data$month,season_of_the_year)
+data$season<-as.character(data$season)
+data$season<-as.factor(data$season)
+
+data$day2<-lapply(data$day, day_of_the_wk)
+data$day2<-as.character(data$day2)
+data$day2<-as.factor(data$day2)
+
+data$hour2<-lapply(data$hour,time_of_the_day)
+data$hour2<-as.character(data$hour2)
+data$hour2<- as.factor(data$hour2)
+
+data_final<-data[,c(8,2,5,13,14,15)]
+
+```
+<br>
+
+### Final data
+
+<font size=5>Our final data looks like that</font>
+<font size=4>
+<ul>
+  <li>We decided to drop cloud_coverage due to 0 correlation with traffic. </li> 
+  <li>Rain_mm and snow_mm occur so rarely that we won't use them, as we have weather_general which suggest the weather conditions.</li>
+  <li>We dropped some outliers</li>
+</ul> 
+</font>
+
+<br>
+
+```{r, data_final, message=FALSE, echo=FALSE}
+
+kable(head(data_final,20))
+
+```
+
+
+## Best algorithm 
+
+### What we tried?
+
+<br>
+
+<font size=4>
+<ul>
+  <li>OLS </li> 
+  <li>LASSO </li>
+  <li>RIDGE </li>
+  <li>Elastic approach between them </li>
+  <li>KNN </li>
+  <li>SVR </li>
+</ul> 
+</font>
+
+<br>
+
+### The best algorithm - SVR
+
+<br>
+
+```{r, knn1}
+
+ctrl_cv5 <- trainControl(method = "cv",
+                         number = 5)
+
+parametersC_sigma2 <- 
+  expand.grid(C = 415,
+              sigma = 0.1)
+
+
+svm_Radial2 <- train(traffic~. + weather_general*hour2  + day2*hour2 + weather_general*day2, 
+                            data = data_final, 
+                            method = "svmRadial",
+                            tuneGrid = parametersC_sigma2,
+                            trControl = ctrl_cv5)
+
+```
+
+<br>
+
+### Plot real data/predicted data
+
+<br>
+```{r, figures-side2, fig.show="hold", echo=FALSE}
+predicted2 = predict(svm_Radial2 , data_final)
+ggplot(data.frame(real = data_final$traffic,
+                  predicted = predicted2 ),
+       aes(x = predicted, 
+           y = real)) +
+  geom_point(col = "blue") +
+  theme_bw()
+
+```
+
+### EXPECTED MAPE
+
+<font size=4> Im going to apply MAPE from a R package MLmetrics </font>
+
+```{r, figures-side3, fig.show="hold", echo=FALSE}
+
+MAPE(predicted2, data_final$traffic+1)
+
+```
+
+<br>
+
+# Classification
+
+<br>
+
+## Data Exploration
+
+```{r libraries22, message=FALSE, include = FALSE}
+library(knitr)
+library(readxl)
+library(dplyr)
+library(readr)
+library(ggplot2)
+library(caret)
+library(ggpubr)
+library(rcompanion)
+library(corrplot)
+library(smotefamily)
+library(remotes)
+library(ROSE)
+library(class)
+source("Classification/functions/F_summary_binary_class.R")
+```
+### General outlook on the data
+
+<font size=4> Let read the data. </font>
+```{r data2, message=FALSE, include = FALSE}
+data2 = read.csv("Classification/drugs_train.csv")
+data2 = data2[,-1]
+```
+<br>
+
+### Age
+
+<font size=4> We decided to merge groups "55-64" and "65+" into one group called "55+". </font>
+
+<br>
+
+```{r age2}
+
+data2$age[data2$age=="55-64"] <- "55+"
+data2$age[data2$age == "65+"] <- "55+"
+
+data2$age = factor(data2$age, levels = c("18-24","25-34","35-44","45-54","55+"),
+                   ordered = TRUE)
+
+data2$age <- droplevels(data2$age)
+
+```
+
+
+```{r gender2, message=FALSE, include = FALSE}
+
+data2$gender = factor(data2$gender, levels = c("male","female"), ordered = TRUE)
+
+```
+
+<br>
+
+### Education
+
+<font size=4> The education variable has many disproportions so we decided to merge people who left school at or before 18 into one group. </font>
+
+<br>
+
+```{r education2}
+
+data2$education[data2$education %in% c("Left school before 16 years",
+                                       "Left school at 16 years",
+                                       "Left school at 17 years",
+                                       "Left school at 18 years")] <- "Left school at or before 18"
+
+data2$education = factor(data2$education, levels = c("Left school at or before 18",
+                                                     "Some college or university, no certificate or degree",
+                                                     "Professional certificate/ diploma",
+                                                     "University degree",
+                                                     "Masters degree",
+                                                     "Doctorate degree"),
+                         ordered = TRUE)
+data2$education <- droplevels(data2$education)
+
+```
+
+### Country
+
+<font size=4> There is a small number of people from Canada and Ireland so we decided to assign them to the group of others. </font>
+
+<br>
+
+```{r country2}
+
+data2$country[data2$country %in% c("Canada","Ireland")] <- "Other"
+
+```
+
+<br>
+
+### Ethnicity
+
+<font size=4> We decided to drop Ethnicity because we have quite homogeneous sample. </font>
+
+<br>
+
+```{r ethnicity2, message=FALSE, include = FALSE}
+
+data2 = data2[,-5]
+
+```
+
+<br>
+
+### Consumption
+
+<font size=4> We decided to downgrade consumption variables into three groups: "regularly", "occasionally" and "never". We also dropped "Consumption Chocolate" and "Consumption Caffeine".  </font>
+
+<br>
+
+```{r consumption2}
+
+# Vector of consumption variables
+consumption_variables = c("consumption_alcohol", "consumption_amphetamines", 
+                          "consumption_cannabis", "consumption_mushrooms", 
+                          "consumption_nicotine")
+# Grouping function
+fun = 
+  function(x){
+  if (x %in% c("never used","used over a decade ago","used in last decade")){
+    x = "never"}
+  else if (x %in% c("used in last year","used in last month")){
+    x = "occasionally"}
+  else if (x %in% c("used in last week","used in last day")){ 
+    x = "regularly"}
+  }
+
+# Applying grouping function
+data2[consumption_variables] = unlist(lapply(data2[consumption_variables], function(y) lapply(y, fun)))
+
+# Modifying into factors
+data2[consumption_variables] = lapply(data2[consumption_variables], 
+                                     function(x) factor(x, levels = c("never","occasionally","regularly"),ordered = TRUE))
+
+# Dropping "Consumption Chocolate" and "Consumption Caffeine" variables
+data2 = data2[,-c(14,16)]
+
+```
+
+<br>
+
+### Personality Variables
+
+<font size=4> Checking for outliers. </font>
+
+```{r outliers2}
+
+min_max = matrix(1:14,nrow = 7, ncol = 2)
+colnames(min_max) = c("Minimum", "Maximum")
+rownames(min_max) = names(which(sapply(data2,is.numeric)))
+min_max[,1] = apply(data2[names(which(sapply(data2,is.numeric)))],2, min)
+min_max[,2] = apply(data2[names(which(sapply(data2,is.numeric)))],2, max)
+kable(min_max)
+
+```
+
+
+<font size=4> We decided to aggregate personality variables and create one called "personality". </font>
+
+
+```{r personality2}
+
+data2["personality"] =  
+  colnames(data2[sapply(data2,is.numeric)])[apply(data2[sapply(data2,is.numeric)],1,which.max)]
+
+data2$personality = as.factor(data2$personality)
+
+```
+
+<br>
+
+### Dependent Variable
+
+```{r dependent2}
+
+kable(table(data2$consumption_cocaine_last_month))
+
+data2$consumption_cocaine_last_month = factor(data2$consumption_cocaine_last_month, levels = c("No","Yes"), ordered = TRUE)
+
+data2 = data2[sapply(data2,is.factor)]
+
+```
+
+<br>
+
+### Statistical Tests
+
+```{r chisqr22, warning=FALSE}
+
+chisqr = matrix(1:10,nrow = 10, ncol = 1)
+colnames(chisqr) = c("p-value")
+rownames(chisqr) = names(which(sapply(data2,is.factor)))
+chisqr[,1] = apply(data2[names(which(sapply(data2,is.factor)))],2, 
+                   function(x) round(chisq.test(x, data2$consumption_cocaine_last_month,correct=FALSE)$p.value,4))
+
+kable(chisqr)
+data2 = data2[,-3]
+
+```
+
+<br>
+
+## Best algorithm 
+
+### What we tried?
+
+<br>
+
+<font size=4>
+<ul>
+  <li>Logistic </li> 
+  <li>KNN </li>
+  <li>SVM </li>
+  <li>Random Forest (additionally, out of curiosity)</li>
+</ul> 
+</font>
+
+<br>
+
+### The best algorithm - SVM
+
+```{r CV, message=FALSE, echo=FALSE}
+options(contrasts = c("contr.treatment",  # for non-ordinal factors
+                      "contr.treatment")) # for ordinal factors
+set.seed(9432398) # We specify random seed
+
+# Train control with cross-validation
+ctrl_cv5 <- trainControl(method = "repeatedcv",
+                         number = 5,
+                         classProbs = TRUE,
+                         summaryFunction = twoClassSummary,
+                         repeats = 3)
+
+ctrl_cv5$sampling = "up"
+```
+
+```{r rf22}
+parametersC_sigma2 <- 
+  expand.grid(C = 0.25,
+              sigma = 0.031)
+
+data2_svm_train <- 
+  train(consumption_cocaine_last_month ~ .,
+        data2,        
+        method = "svmRadial",
+        metric = "ROC",
+        trControl = ctrl_cv5,
+        tuneGrid = parametersC_sigma2)
+
+data2_svm_train
+```
+
+### Balanced Accuracy
+
+```{r  balanced_accuracy}
+
+svm_fitted = predict(data2_svm_train, data2)
+svm_results = summary_binary_class(predicted_classes = svm_fitted,
+                     real = data2$consumption_cocaine_last_month)
+balanced_accuracy=confusionMatrix(as.factor(svm_fitted), data2$consumption_cocaine_last_month)$byClass[11]
+kable(balanced_accuracy)
+
+```
+
+<font size=5><b> Our expected Balanced Accuracy for test dataset equals ```r balanced_accuracy``` </b></font> 
+
+
+```{r predictions, message=FALSE, echo=FALSE}
+
+data_test = read.csv("Classification/drugs_test.csv")
+
+#Age
+data_test$age[data_test$age=="55-64"] <- "55+"
+data_test$age[data_test$age == "65+"] <- "55+"
+
+data_test$age = factor(data_test$age, levels = c("18-24","25-34","35-44","45-54","55+"),
+                   ordered = TRUE)
+
+data_test$age <- droplevels(data_test$age)
+
+#Gendr
+data_test$gender = factor(data_test$gender, levels = c("male","female"), ordered = TRUE)
+
+#Education
+data_test$education[data_test$education %in% c("Left school before 16 years",
+                                       "Left school at 16 years",
+                                       "Left school at 17 years",
+                                       "Left school at 18 years")] <- "Left school at or before 18"
+
+data_test$education = factor(data_test$education, levels = c("Left school at or before 18",
+                                                     "Some college or university, no certificate or degree",
+                                                     "Professional certificate/ diploma",
+                                                     "University degree",
+                                                     "Masters degree",
+                                                     "Doctorate degree"),
+                         ordered = TRUE)
+data_test$education <- droplevels(data_test$education)
+
+#Country
+data_test$country[data_test$country %in% c("Canada","Ireland")] <- "Other"
+
+#Consumption
+# Vector of consumption variables
+consumption_variables = c("consumption_alcohol", "consumption_amphetamines", 
+                          "consumption_cannabis", "consumption_mushrooms", 
+                          "consumption_nicotine")
+# Grouping function
+fun = 
+  function(x){
+    if (x %in% c("never used","used over a decade ago","used in last decade")){
+      x = "never"}
+    else if (x %in% c("used in last year","used in last month")){
+      x = "occasionally"}
+    else if (x %in% c("used in last week","used in last day")){ 
+      x = "regularly"}
+  }
+
+# Applying grouping function
+data_test[consumption_variables] = unlist(lapply(data_test[consumption_variables], function(y) lapply(y, fun)))
+
+# Modifying into factors
+data_test[consumption_variables] = lapply(data_test[consumption_variables], 
+                                      function(x) factor(x, levels = c("never","occasionally","regularly"),ordered = TRUE))
+
+#Personality
+data_test["personality"] =  
+  colnames(data_test[sapply(data_test,is.numeric)])[apply(data_test[sapply(data_test,is.numeric)],1,which.max)]
+data_test$personality = as.factor(data_test$personality)
+# Dropped columns:"ID", "Consumption Chocolate", "Consumption Caffeine","Ethnicity" variables
+colnames(data_test)
+data_test["cocaine_predicted"] = predict(data2_svm_train, data_test)
+#Writing command below
+#write.csv(data_test,"test_classification.csv")
+```

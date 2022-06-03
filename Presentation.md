@@ -29,73 +29,25 @@ output:
 
 ## Data Preparation
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
 
-```{r biblioteki, message=FALSE, include = FALSE}
-library(knitr)
-library(readxl)
-library(dplyr)
-library(readr)
-library(ggplot2)
-library(zoo)
-library(class)
-library(kernlab)
-library(verification)
-library(ggplot2)
-library(tidyverse)
-library(caret)
-library(MLmetrics)
-```
 
-```{r, data, echo=FALSE, message=FALSE, include=FALSE}
-data <- read.csv("Regression/traffic_train.csv")
-```
-```{r, data1,echo=FALSE, message=FALSE, include = FALSE}
-## We decode data into interesting parts for us
-data$date_time <- as.POSIXct(data$date_time, format = "%Y-%m-%d %H:%M:%S")
-## We will check later if quarter, according to our intuition is relevant
-yq <- as.yearqtr(data$date_time, format = "%Y-%m-%d %H:%M:%S")
-data$kwartal<-format(yq, format = "%q")
-## Hour is for sure relevant for the traffic
-data$hour<-format(data$date_time, format='%H')
-data$hour<-as.numeric(data$hour)
 
-## Due to our transformation we receive 3 NAs but it shouldnt be relevant so we just drop them
-data[which(is.na(data$date_time)),]
-data<-na.omit(data)
-```
 
-```{r, Weather, echo=FALSE, message=FALSE, include=FALSE}
-## We decode data into interesting parts for us
-data$date_time <- as.POSIXct(data$date_time, format = "%Y-%m-%d %H:%M:%S")
-## We will check later if quarter, according to our intuition is relevant
-yq <- as.yearqtr(data$date_time, format = "%Y-%m-%d %H:%M:%S")
-data$kwartal<-format(yq, format = "%q")
-## Hour is for sure relevant for the traffic
-data$hour<-format(data$date_time, format='%H')
-data$hour<-as.numeric(data$hour)
-## Due to our transformation we receive 3 NAs but it shouldnt be relevant so we just drop them
-data[which(is.na(data$date_time)),]
-data<-na.omit(data)
-##outliers
-table(data$temperature)
-data<-data[-c(which(data$temperature==-273.1)),]
 
-data<-data[-c(which(data$rain_mm>100)),]
-```
+
+
+
 <br>
 
 ### Weather
 
 <br>
 
-<font size=5>We decided to use only weather_general, without detailed verson of it. Thus, we merged some of the levels</font>
+<font size=5>We decided to use only weather_general, without detailed version of it. Thus, we merged some of the levels</font>
 
-```{r, Weather2}
 
+```r
 data$weather_general <- as.factor(data$weather_general)
 
 data$weather_general[data$weather_general == "Maze"] <- "Fog"
@@ -104,14 +56,18 @@ data$weather_general[data$weather_general == "Squall"] <- "Thunderstorm"
 ```
 
 
-```{r, Weather3, echo=FALSE, MESSAGE=FALSE}
-data$weather_general <- droplevels(data$weather_general)
-a<-kable(table(data$weather_general))
 
-a[[1]]<-"|Variable     |  Frequency|"
-
-a
-```
+|Variable     |  Frequency|
+|:------------|-----:|
+|Clear        |  8020|
+|Clouds       | 10163|
+|Drizzle      |   919|
+|Fog          |   481|
+|Mist         |  3491|
+|Rain         |  3558|
+|Smoke        |   760|
+|Snow         |  1794|
+|Thunderstorm |   501|
 <br>
 
 
@@ -121,7 +77,8 @@ a
 <font size=5>Using barplots we noticed that the hour is highly correlated with the level of traffic</font>
 <br>
 
-```{r, Data_godzina}
+
+```r
 time_of_the_day<-function(x) {
   result<-list()
   if(x>=6 & x<=8){
@@ -140,8 +97,8 @@ time_of_the_day<-function(x) {
 
 <font size=5>Also the season matters in interactions</font>
 
-```{r, season}
 
+```r
 season_of_the_year <- function(x) {
   result<-list()
   if(x=='11' || x=='12' || x=='01'){
@@ -153,49 +110,29 @@ season_of_the_year <- function(x) {
     result <-"The_Rest_of_the_season"}
   return(result)
 }
-
 ```
 <br>
 
 <font size=5>The day of the week is also an important factor</font>
 
 
-```{r, day_of_week}
 
+```r
 day_of_the_wk<- function(x) {
   result<-list()
-  if(x=='sobota' || x=='niedziela'){
+  if(x=='Saturday' || x=='Sunday'){
     result<-"Weekend"
   } 
   else{
     result <-"Working_day"}
   return(result)
 }
-
 ```
 <br>
 
 
 
-```{r, datatransofrm, echo=FALSE, message=FALSE, include=FALSE}
-data$month<-format(data$date_time, format='%m')
-data$day<-weekdays(data$date_time)
 
-data$season<-lapply(data$month,season_of_the_year)
-data$season<-as.character(data$season)
-data$season<-as.factor(data$season)
-
-data$day2<-lapply(data$day, day_of_the_wk)
-data$day2<-as.character(data$day2)
-data$day2<-as.factor(data$day2)
-
-data$hour2<-lapply(data$hour,time_of_the_day)
-data$hour2<-as.character(data$hour2)
-data$hour2<- as.factor(data$hour2)
-
-data_final<-data[,c(8,2,5,13,14,15)]
-
-```
 <br>
 
 ### Final data
@@ -211,11 +148,29 @@ data_final<-data[,c(8,2,5,13,14,15)]
 
 <br>
 
-```{r, data_final, message=FALSE, echo=FALSE}
 
-kable(head(data_final,20))
-
-```
+| traffic|weather_general | temperature|season                 |day2        |hour2                     |
+|-------:|:---------------|-----------:|:----------------------|:-----------|:-------------------------|
+|     508|Clear           |        11.5|The_Rest_of_the_season |Working_day |night                     |
+|     323|Clear           |        10.3|The_Rest_of_the_season |Working_day |night                     |
+|     274|Clear           |         8.0|The_Rest_of_the_season |Working_day |night                     |
+|     372|Clear           |         7.9|The_Rest_of_the_season |Working_day |night                     |
+|     812|Clear           |         6.4|The_Rest_of_the_season |Working_day |night                     |
+|    2720|Clear           |         5.5|The_Rest_of_the_season |Working_day |night                     |
+|    5674|Clear           |         5.1|The_Rest_of_the_season |Working_day |Traffic_morning_peak_hour |
+|    6512|Clear           |         5.0|The_Rest_of_the_season |Working_day |Traffic_morning_peak_hour |
+|    5473|Clear           |         9.3|The_Rest_of_the_season |Working_day |Working_hours             |
+|    5096|Clear           |        18.8|The_Rest_of_the_season |Working_day |Working_hours             |
+|    4887|Clear           |        20.1|The_Rest_of_the_season |Working_day |Working_hours             |
+|    5335|Clear           |        21.2|The_Rest_of_the_season |Working_day |Working_hours             |
+|    5699|Clear           |        22.0|The_Rest_of_the_season |Working_day |Traffic_evening_peak_hour |
+|    6130|Clear           |        22.0|The_Rest_of_the_season |Working_day |Traffic_evening_peak_hour |
+|    4620|Clouds          |        20.5|The_Rest_of_the_season |Working_day |night                     |
+|    3594|Clouds          |        17.5|The_Rest_of_the_season |Working_day |night                     |
+|    2895|Clouds          |        15.0|The_Rest_of_the_season |Working_day |night                     |
+|    2643|Clear           |        14.0|The_Rest_of_the_season |Working_day |night                     |
+|    1783|Clear           |        13.1|The_Rest_of_the_season |Working_day |night                     |
+|    1017|Clear           |        12.1|The_Rest_of_the_season |Working_day |night                     |
 
 
 ## Best algorithm 
@@ -241,8 +196,8 @@ kable(head(data_final,20))
 
 <br>
 
-```{r, knn1}
 
+```r
 ctrl_cv5 <- trainControl(method = "cv",
                          number = 5)
 
@@ -256,7 +211,6 @@ svm_Radial2 <- train(traffic~. + weather_general*hour2  + day2*hour2 + weather_g
                             method = "svmRadial",
                             tuneGrid = parametersC_sigma2,
                             trControl = ctrl_cv5)
-
 ```
 
 <br>
@@ -264,25 +218,15 @@ svm_Radial2 <- train(traffic~. + weather_general*hour2  + day2*hour2 + weather_g
 ### Plot real data/predicted data
 
 <br>
-```{r, figures-side2, fig.show="hold", echo=FALSE}
-predicted2 = predict(svm_Radial2 , data_final)
-ggplot(data.frame(real = data_final$traffic,
-                  predicted = predicted2 ),
-       aes(x = predicted, 
-           y = real)) +
-  geom_point(col = "blue") +
-  theme_bw()
-
-```
+![](Presentation_files/figure-html/figures-side2-1.png)<!-- -->
 
 ### EXPECTED MAPE
 
 <font size=4> Im going to apply MAPE from a R package MLmetrics </font>
 
-```{r, figures-side3, fig.show="hold", echo=FALSE}
 
-MAPE(predicted2, data_final$traffic+1)
-
+```
+## [1] 2.169683
 ```
 
 <br>
@@ -293,71 +237,43 @@ MAPE(predicted2, data_final$traffic+1)
 
 ## Data Exploration
 
-```{r libraries22, message=FALSE, include = FALSE}
-library(knitr)
-library(readxl)
-library(dplyr)
-library(readr)
-library(ggplot2)
-library(caret)
-library(ggpubr)
-library(rcompanion)
-library(corrplot)
-library(smotefamily)
-library(remotes)
-library(ROSE)
-library(class)
-source("Classification/functions/F_summary_binary_class.R")
-```
-### General outlook on data
 
-<br>
+### General outlook on the data
 
 <font size=4> Let read the data. </font>
-```{r data2, message=FALSE, include = FALSE}
-data2 = read.csv("Classification/drugs_train.csv")
-data2 = data2[,-1]
-```
+
 <br>
 
 ### Age
 
-<font size=4> We decided to merge groups "55-64" and "65+" into one group called "55+" to be more representative. </font>
+<font size=4> We decided to merge groups "55-64" and "65+" into one group called "55+". </font>
 
 <br>
 
-```{r age2}
 
+```r
 data2$age[data2$age=="55-64"] <- "55+"
 data2$age[data2$age == "65+"] <- "55+"
 
-data2$age = factor(data2$age, levels = c("18-24",
-                                         "25-34",
-                                         "35-44",
-                                         "45-54",
-                                         "55+"),ordered = TRUE)
+data2$age = factor(data2$age, levels = c("18-24","25-34","35-44","45-54","55+"),
+                   ordered = TRUE)
 
 data2$age <- droplevels(data2$age)
-
 ```
 
 
-```{r gender2, message=FALSE, include = FALSE}
 
-data2$gender = factor(data2$gender, levels = c("male","female"), ordered = TRUE)
-
-```
 
 <br>
 
 ### Education
 
-<font size=4> The education variable is divided into many levels, which is not distributed evenly. We have many disproportions so we decided to merge people who left school at or before 18 into one group. </font>
+<font size=4> The education variable has many disproportions so we decided to merge people who left school at or before 18 into one group. </font>
 
 <br>
 
-```{r education2}
 
+```r
 data2$education[data2$education %in% c("Left school before 16 years",
                                        "Left school at 16 years",
                                        "Left school at 17 years",
@@ -371,34 +287,28 @@ data2$education = factor(data2$education, levels = c("Left school at or before 1
                                                      "Doctorate degree"),
                          ordered = TRUE)
 data2$education <- droplevels(data2$education)
-
 ```
 
 ### Country
 
-<font size=4> There is small number of people from Canada and Ireland so we decided to assign them to the group of others. </font>
+<font size=4> There is a small number of people from Canada and Ireland so we decided to assign them to the group of others. </font>
 
 <br>
 
-```{r country2}
 
+```r
 data2$country[data2$country %in% c("Canada","Ireland")] <- "Other"
-
 ```
 
 <br>
 
 ### Ethnicity
 
-<font size=4> Thus, we decided to drop Ethnicity because it does not provide any reliable information regarding other ethnic groups. </font>
+<font size=4> We decided to drop Ethnicity because we have quite homogeneous sample. </font>
 
 <br>
 
-```{r ethnicity2, message=FALSE, include = FALSE}
 
-data2 = data2[,-5]
-
-```
 
 <br>
 
@@ -408,9 +318,9 @@ data2 = data2[,-5]
 
 <br>
 
-```{r consumption2}
 
-# Vector of consumption variables which concern us 
+```r
+# Vector of consumption variables
 consumption_variables = c("consumption_alcohol", "consumption_amphetamines", 
                           "consumption_cannabis", "consumption_mushrooms", 
                           "consumption_nicotine")
@@ -434,7 +344,6 @@ data2[consumption_variables] = lapply(data2[consumption_variables],
 
 # Dropping "Consumption Chocolate" and "Consumption Caffeine" variables
 data2 = data2[,-c(14,16)]
-
 ```
 
 <br>
@@ -443,54 +352,68 @@ data2 = data2[,-c(14,16)]
 
 <font size=4> Checking for outliers. </font>
 
-<br>
 
-```{r outliers2}
-
+```r
 min_max = matrix(1:14,nrow = 7, ncol = 2)
 colnames(min_max) = c("Minimum", "Maximum")
 rownames(min_max) = names(which(sapply(data2,is.numeric)))
 min_max[,1] = apply(data2[names(which(sapply(data2,is.numeric)))],2, min)
 min_max[,2] = apply(data2[names(which(sapply(data2,is.numeric)))],2, max)
 kable(min_max)
-
 ```
 
-<br>
+
+
+|                              | Minimum| Maximum|
+|:-----------------------------|-------:|-------:|
+|personality_neuroticism       |       0|     100|
+|personality_extraversion      |       0|     100|
+|personality_openness          |       0|     100|
+|personality_agreeableness     |       0|     100|
+|personality_conscientiousness |       0|     100|
+|personality_impulsiveness     |       0|     100|
+|personality_sensation         |       0|     100|
+
 
 <font size=4> We decided to aggregate personality variables and create one called "personality". </font>
 
-<br>
 
-```{r personality2}
 
+```r
 data2["personality"] =  
   colnames(data2[sapply(data2,is.numeric)])[apply(data2[sapply(data2,is.numeric)],1,which.max)]
 
 data2$personality = as.factor(data2$personality)
-
 ```
 
 <br>
 
 ### Dependent Variable
 
-```{r dependent2}
 
+```r
 kable(table(data2$consumption_cocaine_last_month))
+```
 
+
+
+|Var1 | Freq|
+|:----|----:|
+|No   | 1373|
+|Yes  |  127|
+
+```r
 data2$consumption_cocaine_last_month = factor(data2$consumption_cocaine_last_month, levels = c("No","Yes"), ordered = TRUE)
 
 data2 = data2[sapply(data2,is.factor)]
-
 ```
 
 <br>
 
 ### Statistical Tests
 
-```{r chisqr22, message= FALSE}
 
+```r
 chisqr = matrix(1:10,nrow = 10, ncol = 1)
 colnames(chisqr) = c("p-value")
 rownames(chisqr) = names(which(sapply(data2,is.factor)))
@@ -498,8 +421,25 @@ chisqr[,1] = apply(data2[names(which(sapply(data2,is.factor)))],2,
                    function(x) round(chisq.test(x, data2$consumption_cocaine_last_month,correct=FALSE)$p.value,4))
 
 kable(chisqr)
+```
+
+
+
+|                               | p-value|
+|:------------------------------|-------:|
+|age                            |  0.0000|
+|gender                         |  0.0003|
+|education                      |  0.0736|
+|consumption_alcohol            |  0.0040|
+|consumption_amphetamines       |  0.0000|
+|consumption_cannabis           |  0.0000|
+|consumption_mushrooms          |  0.0000|
+|consumption_nicotine           |  0.0000|
+|consumption_cocaine_last_month |  0.0000|
+|personality                    |  0.0000|
+
+```r
 data2 = data2[,-3]
-data2$education
 ```
 
 <br>
@@ -515,50 +455,86 @@ data2$education
   <li>Logistic </li> 
   <li>KNN </li>
   <li>SVM </li>
-  <li>Random Forest </li>
+  <li>Random Forest (additionally, out of curiosity)</li>
 </ul> 
 </font>
 
 <br>
 
-### The best algorithm - RF
+### The best algorithm - SVM
 
-```{r rf22}
 
-options(contrasts = c("contr.treatment",  # for non-ordinal factors
-                      "contr.treatment")) # for ordinal factors
-set.seed(9432398) # We specify random seed
 
-# Train control with cross-validation
-ctrl_cv5 <- trainControl(method = "repeatedcv",
-                         number = 5,
-                         classProbs = TRUE,
-                         summaryFunction = twoClassSummary,
-                         repeats = 3)
 
-ctrl_cv5$sampling = "up"
+```r
+parametersC_sigma2 <- 
+  expand.grid(C = 0.25,
+              sigma = 0.031)
 
-data2_rf_train <- 
+data2_svm_train <- 
   train(consumption_cocaine_last_month ~ .,
         data2,        
-        method = "rf",
+        method = "svmRadial",
         metric = "ROC",
-        trControl = ctrl_cv5)
+        trControl = ctrl_cv5,
+        tuneGrid = parametersC_sigma2)
 
-plot(data2_rf_train)
+data2_svm_train
+```
+
+```
+## Support Vector Machines with Radial Basis Function Kernel 
+## 
+## 1500 samples
+##    8 predictor
+##    2 classes: 'No', 'Yes' 
+## 
+## No pre-processing
+## Resampling: Cross-Validated (5 fold, repeated 3 times) 
+## Summary of sample sizes: 1200, 1200, 1201, 1199, 1200, 1200, ... 
+## Addtional sampling using up-sampling
+## 
+## Resampling results:
+## 
+##   ROC        Sens       Spec    
+##   0.7795483  0.7800495  0.658359
+## 
+## Tuning parameter 'sigma' was held constant at a value of 0.031
+## Tuning
+##  parameter 'C' was held constant at a value of 0.25
 ```
 
 ### Balanced Accuracy
 
-```{r  balanced_accuracy}
 
-rf_fitted = predict(data2_rf_train, data2)
-rf_results = summary_binary_class(predicted_classes = rf_fitted,
+```r
+svm_fitted = predict(data2_svm_train, data2)
+svm_results = summary_binary_class(predicted_classes = svm_fitted,
                      real = data2$consumption_cocaine_last_month)
-balanced_accuracy=confusionMatrix(as.factor(rf_fitted), data2$consumption_cocaine_last_month)$byClass[11]
+balanced_accuracy=confusionMatrix(as.factor(svm_fitted), data2$consumption_cocaine_last_month)$byClass[11]
 kable(balanced_accuracy)
-
 ```
 
-<font size=5><b> Our expected Balanced Accuracy for test dataset equals 83.04%</b></font>
 
+
+|                  |         x|
+|:-----------------|---------:|
+|Balanced Accuracy | 0.8052973|
+
+<font size=5><b> Our expected Balanced Accuracy for test dataset equals ``0.8052973`` </b></font> 
+
+## Predictions
+
+```
+##  [1] "id"                            "age"                          
+##  [3] "gender"                        "education"                    
+##  [5] "country"                       "ethnicity"                    
+##  [7] "personality_neuroticism"       "personality_extraversion"     
+##  [9] "personality_openness"          "personality_agreeableness"    
+## [11] "personality_conscientiousness" "personality_impulsiveness"    
+## [13] "personality_sensation"         "consumption_alcohol"          
+## [15] "consumption_amphetamines"      "consumption_caffeine"         
+## [17] "consumption_cannabis"          "consumption_chocolate"        
+## [19] "consumption_mushrooms"         "consumption_nicotine"         
+## [21] "personality"
+```
