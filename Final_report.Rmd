@@ -386,6 +386,18 @@ kable(head(data_final,20))
 ```
 <br>
 
+<font size=4> But let's exclude a 10% validation sample just to be sure that at the end we can go with the right algorithm</font>
+
+```{r,finaldataset_validation}
+X<-sample(seq(1:29687), 3000)
+
+data_validation <- data_final[X,]
+
+data_final<-data_final[-X, ]
+```
+
+<br>
+
 
 ## Algorithms
 
@@ -678,10 +690,10 @@ ggplot(data.frame(real = data_final$traffic,
 
 <font size=4> First im gonna create a data frame with our predictions
 ```{r MAPE }
-predicted_ols <- predict(traffic_lm, data_final)
-predicted_lasso_ridge <- predict(traffic_elastic , data_final)
-predicted_svr <- predict(svm_Radial2 , data_final)
-predicted_knn <- predict(traffic_knn, data_final)
+predicted_ols <- predict(traffic_lm, data_validation)
+predicted_lasso_ridge <- predict(traffic_elastic , data_validation)
+predicted_svr <- predict(svm_Radial2 , data_validation)
+predicted_knn <- predict(traffic_knn, data_validation)
 
 predictions<-data.frame(predicted_ols,predicted_lasso_ridge,predicted_svr,predicted_knn)
 
@@ -694,7 +706,7 @@ MAPE<-matrix(8,nrow=2,ncol=4)
 for(i in 1:length(predictions))
 {
   MAPE[1,i] <-colnames(predictions[i])
-  MAPE[2,i] <-MAPE(unlist(predictions[i]), data_final$traffic+1)
+  MAPE[2,i] <-MAPE(unlist(predictions[i]), data_validation$traffic+1)
   if(i==length(predictions))
   {
     print(paste0('The best algorithm for our dataset is ', substr(MAPE[1,which(MAPE[2,]==min(MAPE))],11,20), ' with the predicted MAPE equals to ',
@@ -709,7 +721,7 @@ kable(MAPE)
 
 <font size=4>So SVR, then KNN are performing the best. I think it's rather data-depended which one should we chose </font>
 
-<font size=4> Expected error? about 2-3% in MAPE. Exactly 2.17% </font>
+<font size=4> Expected error? about 2-3% in MAPE </font>
 
 <br>
 <br><br>

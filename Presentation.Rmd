@@ -48,6 +48,7 @@ library(ggplot2)
 library(tidyverse)
 library(caret)
 library(MLmetrics)
+library(rio)
 ```
 
 ```{r, data, echo=FALSE, message=FALSE, include=FALSE}
@@ -285,6 +286,101 @@ MAPE(predicted2, data_final$traffic+1)
 
 ```
 
+
+```{r, test_data_regression, message=FALSE, echo=FALSE, include=FALSE}
+
+################# Test data
+
+
+
+data_test <- read.csv("Regression/traffic_test.csv")
+
+## Rozkodywanie daty
+data_test$date_time <- as.POSIXct(data_test$date_time, format = "%Y-%m-%d %H:%M:%S")
+yq <- as.yearqtr(data_test$date_time, format = "%Y-%m-%d %H:%M:%S")
+data_test$kwartal<-format(yq, format = "%q")
+data_test$hour<-format(data_test$date_time, format='%H')
+data_test$hour<-as.numeric(data_test$hour)
+
+data_test[which(is.na(data_test$date_time)),]
+data_test[2566,9]<-2
+
+time_of_the_day<-function(x) {
+  result<-list()
+  if(x>=6 & x<=8){
+    result<-"Traffic_morning_peak_hour"
+  } 
+  else if(x>8 & x<15){
+    result<-"Working_hours"}
+  else if(x>=15 & x<=17){
+    result<-"Traffic_evening_peak_hour"}
+  else{
+    result <-"night"}
+  return(result)
+}
+
+data_test$hour2<-lapply(data_test$hour,time_of_the_day)
+data_test$hour2<-as.character(data_test$hour2)
+
+data_test$weather_general <- as.factor(data_test$weather_general)
+
+data_test$weather_general[data_test$weather_general == "Maze"] <- "Fog"
+data_test$weather_general[data_test$weather_general == "Haze"] <- "Smoke"
+data_test$weather_general[data_test$weather_general == "Squall"] <- "Thunderstorm"
+
+data_test$weather_general <- droplevels(data_test$weather_general)
+table(data_test$weather_general)
+
+data_test$hour2<- as.factor(data_test$hour2)
+
+data_test$month<-format(data_test$date_time, format='%m')
+data_test$day<-weekdays(data_test$date_time)
+
+data_test[2566,11]<-"03"
+
+season_of_the_year <- function(x) {
+  result<-list()
+  if(x=='11' || x=='12' || x=='01'){
+    result<-"Winter"
+  } 
+  else if(x=='07' || x=='08' || x=='09'){
+    result<-"Summer_Holidays"}
+  else{
+    result <-"The_Rest_of_the_season"}
+  return(result)
+}
+
+data_test[2566,12]<-"czwartek"
+
+day_of_the_wk<- function(x) {
+  result<-list()
+  if(x=='sobota' || x=='niedziela'){
+    result<-"Weekend"
+  } 
+  else{
+    result <-"Working_day"}
+  return(result)
+}
+
+data_test$season<-lapply(data_test$month,season_of_the_year)
+data_test$season<-as.character(data_test$season)
+data_test$season<-as.factor(data_test$season)
+
+
+data_test$day2<-lapply(data_test$day, day_of_the_wk)
+data_test$day2<-as.character(data_test$day2)
+data_test$day2<-as.factor(data_test$day2)
+
+data_test_final<-data_test[,c(2,5,10,13,14)]
+
+
+predicted_test = predict(svm_Radial2 , data_test_final)
+data_test_final['predicted'] <- predicted_test
+
+export(data_test_final, "predicted_test.csv")
+
+
+```
 <br>
 
 # Classification
@@ -429,7 +525,6 @@ data2[consumption_variables] = lapply(data2[consumption_variables],
 
 # Dropping "Consumption Chocolate" and "Consumption Caffeine" variables
 data2 = data2[,-c(14,16)]
-
 ```
 
 <br>
@@ -560,7 +655,7 @@ kable(balanced_accuracy)
 <font size=5><b> Our expected Balanced Accuracy for test dataset equals ```r balanced_accuracy``` </b></font> 
 
 
-```{r predictions, message=FALSE, echo=FALSE}
+```{r predictions, message=FALSE, echo=FALSE, include=FALSE}
 
 data_test = read.csv("Classification/drugs_test.csv")
 

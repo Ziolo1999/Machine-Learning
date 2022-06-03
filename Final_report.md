@@ -341,7 +341,7 @@ season_of_the_year <- function(x) {
 
 day_of_the_wk<- function(x) {
   result<-list()
-  if(x=='Saturday' || x=='Sunday'){
+  if(x=='sobota' || x=='niedziela'){
     result<-"Weekend"
   } 
   else{
@@ -406,6 +406,19 @@ kable(head(data_final,20))
 |    2643|Clear           |        14.0|night                     |The_Rest_of_the_season |Working_day |
 |    1783|Clear           |        13.1|night                     |The_Rest_of_the_season |Working_day |
 |    1017|Clear           |        12.1|night                     |The_Rest_of_the_season |Working_day |
+<br>
+
+<font size=4> But let's exclude a 10% validation sample just to be sure that at the end we can go with the right algorithm</font>
+
+
+```r
+X<-sample(seq(1:29687), 3000)
+
+data_validation <- data_final[X,]
+
+data_final<-data_final[-X, ]
+```
+
 <br>
 
 
@@ -474,32 +487,32 @@ summary(traffic_lm)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -4813.5  -784.6    63.7   768.8  4315.8 
+## -4813.6  -785.7    61.9   767.6  4317.5 
 ## 
 ## Coefficients:
 ##                                 Estimate Std. Error t value Pr(>|t|)    
-## weather_generalClear            738.2088    25.8835  28.520  < 2e-16 ***
-## weather_generalClouds           814.2964    26.8965  30.275  < 2e-16 ***
-## weather_generalDrizzle          646.5086    47.2104  13.694  < 2e-16 ***
-## weather_generalFog              354.5329    59.6138   5.947 2.76e-09 ***
-## weather_generalMist             503.0357    31.8790  15.780  < 2e-16 ***
-## weather_generalRain             641.9723    32.0956  20.002  < 2e-16 ***
-## weather_generalSmoke            774.7400    49.9655  15.505  < 2e-16 ***
-## weather_generalSnow             630.2230    37.6661  16.732  < 2e-16 ***
-## weather_generalThunderstorm     461.5626    58.8480   7.843 4.54e-15 ***
-## temperature                      18.8560     0.7947  23.727  < 2e-16 ***
-## hour2Traffic_evening_peak_hour 3515.8465    22.5515 155.903  < 2e-16 ***
-## hour2Traffic_morning_peak_hour 2750.3711    21.7872 126.238  < 2e-16 ***
-## hour2Working_hours             2738.7767    17.2487 158.782  < 2e-16 ***
-## seasonThe_Rest_of_the_season    306.6097    20.1475  15.218  < 2e-16 ***
-## seasonWinter                    232.3172    27.3385   8.498  < 2e-16 ***
-## day2Working_day                1000.2938    15.4031  64.941  < 2e-16 ***
+## weather_generalClear            740.2051    27.2723  27.141  < 2e-16 ***
+## weather_generalClouds           813.3649    28.2927  28.748  < 2e-16 ***
+## weather_generalDrizzle          641.1362    49.7062  12.899  < 2e-16 ***
+## weather_generalFog              327.1760    63.1990   5.177 2.27e-07 ***
+## weather_generalMist             501.7628    33.6044  14.931  < 2e-16 ***
+## weather_generalRain             645.8060    33.7581  19.130  < 2e-16 ***
+## weather_generalSmoke            767.4813    52.9840  14.485  < 2e-16 ***
+## weather_generalSnow             607.4643    39.7137  15.296  < 2e-16 ***
+## weather_generalThunderstorm     455.3243    61.5701   7.395 1.45e-13 ***
+## temperature                      18.8271     0.8356  22.532  < 2e-16 ***
+## hour2Traffic_evening_peak_hour 3517.6989    23.8132 147.721  < 2e-16 ***
+## hour2Traffic_morning_peak_hour 2765.5006    22.9735 120.378  < 2e-16 ***
+## hour2Working_hours             2745.5990    18.1721 151.089  < 2e-16 ***
+## seasonThe_Rest_of_the_season    300.3272    21.2235  14.151  < 2e-16 ***
+## seasonWinter                    228.0192    28.8060   7.916 2.55e-15 ***
+## day2Working_day                1000.7816    16.2285  61.668  < 2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 1198 on 29671 degrees of freedom
+## Residual standard error: 1197 on 26671 degrees of freedom
 ## Multiple R-squared:  0.9003,	Adjusted R-squared:  0.9002 
-## F-statistic: 1.674e+04 on 16 and 29671 DF,  p-value: < 2.2e-16
+## F-statistic: 1.504e+04 on 16 and 26671 DF,  p-value: < 2.2e-16
 ```
 
 ```r
@@ -517,119 +530,171 @@ summary(traffic_lm2)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -5050.4  -766.6    16.2   653.0  3963.0 
+## -5065.1  -769.3    10.1   653.8  3706.6 
 ## 
 ## Coefficients:
-##                                                            Estimate Std. Error
-## weather_generalClear                                       1379.120     29.789
-## weather_generalClouds                                      1529.397     30.834
-## weather_generalDrizzle                                     1245.757     79.568
-## weather_generalFog                                          704.262     95.861
-## weather_generalMist                                         953.553     42.807
-## weather_generalRain                                        1221.987     44.080
-## weather_generalSmoke                                       1308.158     89.881
-## weather_generalSnow                                        1351.574     58.715
-## weather_generalThunderstorm                                 850.751     90.698
-## temperature                                                  18.863      0.703
-## hour2Traffic_evening_peak_hour                             2485.157     49.914
-## hour2Traffic_morning_peak_hour                               85.496     48.022
-## hour2Working_hours                                         2219.869     37.586
-## seasonThe_Rest_of_the_season                                306.885     17.722
-## seasonWinter                                                228.055     24.061
-## day2Working_day                                              93.282     28.357
-## weather_generalClouds:hour2Traffic_evening_peak_hour       -134.420     49.990
-## weather_generalDrizzle:hour2Traffic_evening_peak_hour       182.838    115.013
-## weather_generalFog:hour2Traffic_evening_peak_hour          -203.488    248.253
-## weather_generalMist:hour2Traffic_evening_peak_hour          217.057     81.548
-## weather_generalRain:hour2Traffic_evening_peak_hour           55.287     67.488
-## weather_generalSmoke:hour2Traffic_evening_peak_hour        -181.655    123.365
-## weather_generalSnow:hour2Traffic_evening_peak_hour         -140.452     91.995
-## weather_generalThunderstorm:hour2Traffic_evening_peak_hour  -50.002    171.558
-## weather_generalClouds:hour2Traffic_morning_peak_hour       -221.836     51.902
-## weather_generalDrizzle:hour2Traffic_morning_peak_hour       -44.324    110.127
-## weather_generalFog:hour2Traffic_morning_peak_hour           522.152    118.580
-## weather_generalMist:hour2Traffic_morning_peak_hour          229.029     60.543
-## weather_generalRain:hour2Traffic_morning_peak_hour          -72.856     67.591
-## weather_generalSmoke:hour2Traffic_morning_peak_hour        -240.751    144.683
-## weather_generalSnow:hour2Traffic_morning_peak_hour         -257.320     85.837
-## weather_generalThunderstorm:hour2Traffic_morning_peak_hour   67.555    140.955
-## weather_generalClouds:hour2Working_hours                   -144.805     38.735
-## weather_generalDrizzle:hour2Working_hours                   105.639     92.768
-## weather_generalFog:hour2Working_hours                       358.140    142.981
-## weather_generalMist:hour2Working_hours                      228.531     54.840
-## weather_generalRain:hour2Working_hours                       28.121     52.750
-## weather_generalSmoke:hour2Working_hours                    -237.444     92.876
-## weather_generalSnow:hour2Working_hours                      -14.603     66.368
-## weather_generalThunderstorm:hour2Working_hours             -201.415    131.197
-## hour2Traffic_evening_peak_hour:day2Working_day             1481.119     43.420
-## hour2Traffic_morning_peak_hour:day2Working_day             3826.144     42.064
-## hour2Working_hours:day2Working_day                          755.378     33.507
-## weather_generalClouds:day2Working_day                        -7.532     34.775
-## weather_generalDrizzle:day2Working_day                       10.377     82.010
-## weather_generalFog:day2Working_day                           96.481    107.038
-## weather_generalMist:day2Working_day                         105.730     46.977
-## weather_generalRain:day2Working_day                          76.278     47.412
-## weather_generalSmoke:day2Working_day                        382.009     87.864
-## weather_generalSnow:day2Working_day                         -17.216     62.146
-## weather_generalThunderstorm:day2Working_day                 397.403    102.448
-##                                                            t value Pr(>|t|)    
-## weather_generalClear                                        46.297  < 2e-16 ***
-## weather_generalClouds                                       49.600  < 2e-16 ***
-## weather_generalDrizzle                                      15.656  < 2e-16 ***
-## weather_generalFog                                           7.347 2.08e-13 ***
-## weather_generalMist                                         22.276  < 2e-16 ***
-## weather_generalRain                                         27.722  < 2e-16 ***
-## weather_generalSmoke                                        14.554  < 2e-16 ***
-## weather_generalSnow                                         23.019  < 2e-16 ***
-## weather_generalThunderstorm                                  9.380  < 2e-16 ***
-## temperature                                                 26.830  < 2e-16 ***
-## hour2Traffic_evening_peak_hour                              49.789  < 2e-16 ***
-## hour2Traffic_morning_peak_hour                               1.780 0.075027 .  
-## hour2Working_hours                                          59.061  < 2e-16 ***
-## seasonThe_Rest_of_the_season                                17.317  < 2e-16 ***
-## seasonWinter                                                 9.478  < 2e-16 ***
-## day2Working_day                                              3.290 0.001005 ** 
-## weather_generalClouds:hour2Traffic_evening_peak_hour        -2.689 0.007172 ** 
-## weather_generalDrizzle:hour2Traffic_evening_peak_hour        1.590 0.111910    
-## weather_generalFog:hour2Traffic_evening_peak_hour           -0.820 0.412406    
-## weather_generalMist:hour2Traffic_evening_peak_hour           2.662 0.007779 ** 
-## weather_generalRain:hour2Traffic_evening_peak_hour           0.819 0.412671    
-## weather_generalSmoke:hour2Traffic_evening_peak_hour         -1.473 0.140896    
-## weather_generalSnow:hour2Traffic_evening_peak_hour          -1.527 0.126835    
-## weather_generalThunderstorm:hour2Traffic_evening_peak_hour  -0.291 0.770701    
-## weather_generalClouds:hour2Traffic_morning_peak_hour        -4.274 1.92e-05 ***
-## weather_generalDrizzle:hour2Traffic_morning_peak_hour       -0.402 0.687334    
-## weather_generalFog:hour2Traffic_morning_peak_hour            4.403 1.07e-05 ***
-## weather_generalMist:hour2Traffic_morning_peak_hour           3.783 0.000155 ***
-## weather_generalRain:hour2Traffic_morning_peak_hour          -1.078 0.281089    
-## weather_generalSmoke:hour2Traffic_morning_peak_hour         -1.664 0.096125 .  
-## weather_generalSnow:hour2Traffic_morning_peak_hour          -2.998 0.002722 ** 
-## weather_generalThunderstorm:hour2Traffic_morning_peak_hour   0.479 0.631752    
-## weather_generalClouds:hour2Working_hours                    -3.738 0.000186 ***
-## weather_generalDrizzle:hour2Working_hours                    1.139 0.254816    
-## weather_generalFog:hour2Working_hours                        2.505 0.012257 *  
-## weather_generalMist:hour2Working_hours                       4.167 3.09e-05 ***
-## weather_generalRain:hour2Working_hours                       0.533 0.593974    
-## weather_generalSmoke:hour2Working_hours                     -2.557 0.010576 *  
-## weather_generalSnow:hour2Working_hours                      -0.220 0.825846    
-## weather_generalThunderstorm:hour2Working_hours              -1.535 0.124743    
-## hour2Traffic_evening_peak_hour:day2Working_day              34.111  < 2e-16 ***
-## hour2Traffic_morning_peak_hour:day2Working_day              90.960  < 2e-16 ***
-## hour2Working_hours:day2Working_day                          22.544  < 2e-16 ***
-## weather_generalClouds:day2Working_day                       -0.217 0.828515    
-## weather_generalDrizzle:day2Working_day                       0.127 0.899311    
-## weather_generalFog:day2Working_day                           0.901 0.367398    
-## weather_generalMist:day2Working_day                          2.251 0.024414 *  
-## weather_generalRain:day2Working_day                          1.609 0.107664    
-## weather_generalSmoke:day2Working_day                         4.348 1.38e-05 ***
-## weather_generalSnow:day2Working_day                         -0.277 0.781763    
-## weather_generalThunderstorm:day2Working_day                  3.879 0.000105 ***
+##                                                              Estimate
+## weather_generalClear                                       1374.19982
+## weather_generalClouds                                      1523.91904
+## weather_generalDrizzle                                     1248.12381
+## weather_generalFog                                          684.61467
+## weather_generalMist                                         957.34749
+## weather_generalRain                                        1230.72249
+## weather_generalSmoke                                       1318.01607
+## weather_generalSnow                                        1314.75064
+## weather_generalThunderstorm                                 817.48145
+## temperature                                                  18.75272
+## hour2Traffic_evening_peak_hour                             2486.94354
+## hour2Traffic_morning_peak_hour                               85.61247
+## hour2Working_hours                                         2214.78250
+## seasonThe_Rest_of_the_season                                304.47810
+## seasonWinter                                                224.77417
+## day2Working_day                                              98.18369
+## weather_generalClouds:hour2Traffic_evening_peak_hour       -122.73808
+## weather_generalDrizzle:hour2Traffic_evening_peak_hour       207.47573
+## weather_generalFog:hour2Traffic_evening_peak_hour          -217.06334
+## weather_generalMist:hour2Traffic_evening_peak_hour          218.40306
+## weather_generalRain:hour2Traffic_evening_peak_hour           37.86629
+## weather_generalSmoke:hour2Traffic_evening_peak_hour        -150.06662
+## weather_generalSnow:hour2Traffic_evening_peak_hour         -148.52132
+## weather_generalThunderstorm:hour2Traffic_evening_peak_hour -113.05116
+## weather_generalClouds:hour2Traffic_morning_peak_hour       -195.66087
+## weather_generalDrizzle:hour2Traffic_morning_peak_hour       -34.71276
+## weather_generalFog:hour2Traffic_morning_peak_hour           526.34887
+## weather_generalMist:hour2Traffic_morning_peak_hour          217.73879
+## weather_generalRain:hour2Traffic_morning_peak_hour          -39.51612
+## weather_generalSmoke:hour2Traffic_morning_peak_hour        -253.46332
+## weather_generalSnow:hour2Traffic_morning_peak_hour         -234.99539
+## weather_generalThunderstorm:hour2Traffic_morning_peak_hour   27.52934
+## weather_generalClouds:hour2Working_hours                   -130.57030
+## weather_generalDrizzle:hour2Working_hours                    95.93234
+## weather_generalFog:hour2Working_hours                       324.01558
+## weather_generalMist:hour2Working_hours                      215.71131
+## weather_generalRain:hour2Working_hours                       35.49691
+## weather_generalSmoke:hour2Working_hours                    -236.76845
+## weather_generalSnow:hour2Working_hours                       -9.44356
+## weather_generalThunderstorm:hour2Working_hours             -221.22589
+## hour2Traffic_evening_peak_hour:day2Working_day             1478.93018
+## hour2Traffic_morning_peak_hour:day2Working_day             3826.50495
+## hour2Working_hours:day2Working_day                          766.69619
+## weather_generalClouds:day2Working_day                       -14.52644
+## weather_generalDrizzle:day2Working_day                       -4.59173
+## weather_generalFog:day2Working_day                          101.99146
+## weather_generalMist:day2Working_day                         109.89935
+## weather_generalRain:day2Working_day                          60.64082
+## weather_generalSmoke:day2Working_day                        352.37630
+## weather_generalSnow:day2Working_day                          -0.08175
+## weather_generalThunderstorm:day2Working_day                 446.60024
+##                                                            Std. Error t value
+## weather_generalClear                                         31.35580  43.826
+## weather_generalClouds                                        32.33182  47.134
+## weather_generalDrizzle                                       83.75222  14.903
+## weather_generalFog                                          102.91856   6.652
+## weather_generalMist                                          45.48062  21.050
+## weather_generalRain                                          46.33455  26.562
+## weather_generalSmoke                                         96.19395  13.702
+## weather_generalSnow                                          61.72211  21.301
+## weather_generalThunderstorm                                  94.20981   8.677
+## temperature                                                   0.73916  25.370
+## hour2Traffic_evening_peak_hour                               53.17227  46.771
+## hour2Traffic_morning_peak_hour                               50.99101   1.679
+## hour2Working_hours                                           39.56930  55.972
+## seasonThe_Rest_of_the_season                                 18.67325  16.306
+## seasonWinter                                                 25.35602   8.865
+## day2Working_day                                              29.86176   3.288
+## weather_generalClouds:hour2Traffic_evening_peak_hour         53.03754  -2.314
+## weather_generalDrizzle:hour2Traffic_evening_peak_hour       121.82767   1.703
+## weather_generalFog:hour2Traffic_evening_peak_hour           255.84562  -0.848
+## weather_generalMist:hour2Traffic_evening_peak_hour           86.95264   2.512
+## weather_generalRain:hour2Traffic_evening_peak_hour           70.96740   0.534
+## weather_generalSmoke:hour2Traffic_evening_peak_hour         132.61332  -1.132
+## weather_generalSnow:hour2Traffic_evening_peak_hour           96.75928  -1.535
+## weather_generalThunderstorm:hour2Traffic_evening_peak_hour  181.23327  -0.624
+## weather_generalClouds:hour2Traffic_morning_peak_hour         54.84259  -3.568
+## weather_generalDrizzle:hour2Traffic_morning_peak_hour       115.65986  -0.300
+## weather_generalFog:hour2Traffic_morning_peak_hour           125.79696   4.184
+## weather_generalMist:hour2Traffic_morning_peak_hour           63.84450   3.410
+## weather_generalRain:hour2Traffic_morning_peak_hour           70.89460  -0.557
+## weather_generalSmoke:hour2Traffic_morning_peak_hour         155.40751  -1.631
+## weather_generalSnow:hour2Traffic_morning_peak_hour           89.80875  -2.617
+## weather_generalThunderstorm:hour2Traffic_morning_peak_hour  148.52422   0.185
+## weather_generalClouds:hour2Working_hours                     40.84440  -3.197
+## weather_generalDrizzle:hour2Working_hours                    96.63302   0.993
+## weather_generalFog:hour2Working_hours                       151.48323   2.139
+## weather_generalMist:hour2Working_hours                       57.64087   3.742
+## weather_generalRain:hour2Working_hours                       55.53929   0.639
+## weather_generalSmoke:hour2Working_hours                      98.50240  -2.404
+## weather_generalSnow:hour2Working_hours                       70.27466  -0.134
+## weather_generalThunderstorm:hour2Working_hours              135.95756  -1.627
+## hour2Traffic_evening_peak_hour:day2Working_day               45.93255  32.198
+## hour2Traffic_morning_peak_hour:day2Working_day               44.38578  86.210
+## hour2Working_hours:day2Working_day                           35.27818  21.733
+## weather_generalClouds:day2Working_day                        36.67418  -0.396
+## weather_generalDrizzle:day2Working_day                       86.00271  -0.053
+## weather_generalFog:day2Working_day                          114.21809   0.893
+## weather_generalMist:day2Working_day                          49.63657   2.214
+## weather_generalRain:day2Working_day                          49.83467   1.217
+## weather_generalSmoke:day2Working_day                         93.86828   3.754
+## weather_generalSnow:day2Working_day                          65.43369  -0.001
+## weather_generalThunderstorm:day2Working_day                 106.73361   4.184
+##                                                            Pr(>|t|)    
+## weather_generalClear                                        < 2e-16 ***
+## weather_generalClouds                                       < 2e-16 ***
+## weather_generalDrizzle                                      < 2e-16 ***
+## weather_generalFog                                         2.95e-11 ***
+## weather_generalMist                                         < 2e-16 ***
+## weather_generalRain                                         < 2e-16 ***
+## weather_generalSmoke                                        < 2e-16 ***
+## weather_generalSnow                                         < 2e-16 ***
+## weather_generalThunderstorm                                 < 2e-16 ***
+## temperature                                                 < 2e-16 ***
+## hour2Traffic_evening_peak_hour                              < 2e-16 ***
+## hour2Traffic_morning_peak_hour                             0.093169 .  
+## hour2Working_hours                                          < 2e-16 ***
+## seasonThe_Rest_of_the_season                                < 2e-16 ***
+## seasonWinter                                                < 2e-16 ***
+## day2Working_day                                            0.001011 ** 
+## weather_generalClouds:hour2Traffic_evening_peak_hour       0.020666 *  
+## weather_generalDrizzle:hour2Traffic_evening_peak_hour      0.088575 .  
+## weather_generalFog:hour2Traffic_evening_peak_hour          0.396214    
+## weather_generalMist:hour2Traffic_evening_peak_hour         0.012019 *  
+## weather_generalRain:hour2Traffic_evening_peak_hour         0.593641    
+## weather_generalSmoke:hour2Traffic_evening_peak_hour        0.257808    
+## weather_generalSnow:hour2Traffic_evening_peak_hour         0.124806    
+## weather_generalThunderstorm:hour2Traffic_evening_peak_hour 0.532772    
+## weather_generalClouds:hour2Traffic_morning_peak_hour       0.000361 ***
+## weather_generalDrizzle:hour2Traffic_morning_peak_hour      0.764082    
+## weather_generalFog:hour2Traffic_morning_peak_hour          2.87e-05 ***
+## weather_generalMist:hour2Traffic_morning_peak_hour         0.000650 ***
+## weather_generalRain:hour2Traffic_morning_peak_hour         0.577264    
+## weather_generalSmoke:hour2Traffic_morning_peak_hour        0.102911    
+## weather_generalSnow:hour2Traffic_morning_peak_hour         0.008886 ** 
+## weather_generalThunderstorm:hour2Traffic_morning_peak_hour 0.852954    
+## weather_generalClouds:hour2Working_hours                   0.001391 ** 
+## weather_generalDrizzle:hour2Working_hours                  0.320841    
+## weather_generalFog:hour2Working_hours                      0.032449 *  
+## weather_generalMist:hour2Working_hours                     0.000183 ***
+## weather_generalRain:hour2Working_hours                     0.522743    
+## weather_generalSmoke:hour2Working_hours                    0.016238 *  
+## weather_generalSnow:hour2Working_hours                     0.893103    
+## weather_generalThunderstorm:hour2Working_hours             0.103713    
+## hour2Traffic_evening_peak_hour:day2Working_day              < 2e-16 ***
+## hour2Traffic_morning_peak_hour:day2Working_day              < 2e-16 ***
+## hour2Working_hours:day2Working_day                          < 2e-16 ***
+## weather_generalClouds:day2Working_day                      0.692039    
+## weather_generalDrizzle:day2Working_day                     0.957421    
+## weather_generalFog:day2Working_day                         0.371890    
+## weather_generalMist:day2Working_day                        0.026832 *  
+## weather_generalRain:day2Working_day                        0.223676    
+## weather_generalSmoke:day2Working_day                       0.000174 ***
+## weather_generalSnow:day2Working_day                        0.999003    
+## weather_generalThunderstorm:day2Working_day                2.87e-05 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 1052 on 29636 degrees of freedom
-## Multiple R-squared:  0.9232,	Adjusted R-squared:  0.9231 
-## F-statistic:  6984 on 51 and 29636 DF,  p-value: < 2.2e-16
+## Residual standard error: 1051 on 26636 degrees of freedom
+## Multiple R-squared:  0.9232,	Adjusted R-squared:  0.923 
+## F-statistic:  6275 on 51 and 26636 DF,  p-value: < 2.2e-16
 ```
 
 ```r
@@ -744,7 +809,7 @@ traffic_elastic$bestTune
 
 ```
 ##     alpha lambda
-## 415   0.8      1
+## 514     1    0.8
 ```
 
 <br>
@@ -1249,16 +1314,16 @@ svm_Radial2
 ```
 ## Support Vector Machines with Radial Basis Function Kernel 
 ## 
-## 29687 samples
+## 26687 samples
 ##     5 predictor
 ## 
 ## No pre-processing
 ## Resampling: Cross-Validated (5 fold) 
-## Summary of sample sizes: 23750, 23751, 23748, 23750, 23749 
+## Summary of sample sizes: 21351, 21349, 21350, 21349, 21349 
 ## Resampling results:
 ## 
-##   RMSE      Rsquared   MAE     
-##   1061.184  0.7274451  776.9671
+##   RMSE     Rsquared   MAE     
+##   1063.66  0.7272898  778.9571
 ## 
 ## Tuning parameter 'sigma' was held constant at a value of 0.1
 ## Tuning
@@ -1279,10 +1344,10 @@ svm_Radial2
 <font size=4> First im gonna create a data frame with our predictions
 
 ```r
-predicted_ols <- predict(traffic_lm, data_final)
-predicted_lasso_ridge <- predict(traffic_elastic , data_final)
-predicted_svr <- predict(svm_Radial2 , data_final)
-predicted_knn <- predict(traffic_knn, data_final)
+predicted_ols <- predict(traffic_lm, data_validation)
+predicted_lasso_ridge <- predict(traffic_elastic , data_validation)
+predicted_svr <- predict(svm_Radial2 , data_validation)
+predicted_knn <- predict(traffic_knn, data_validation)
 
 predictions<-data.frame(predicted_ols,predicted_lasso_ridge,predicted_svr,predicted_knn)
 
@@ -1296,7 +1361,7 @@ MAPE<-matrix(8,nrow=2,ncol=4)
 for(i in 1:length(predictions))
 {
   MAPE[1,i] <-colnames(predictions[i])
-  MAPE[2,i] <-MAPE(unlist(predictions[i]), data_final$traffic+1)
+  MAPE[2,i] <-MAPE(unlist(predictions[i]), data_validation$traffic+1)
   if(i==length(predictions))
   {
     print(paste0('The best algorithm for our dataset is ', substr(MAPE[1,which(MAPE[2,]==min(MAPE))],11,20), ' with the predicted MAPE equals to ',
@@ -1307,7 +1372,7 @@ for(i in 1:length(predictions))
 ```
 
 ```
-## [1] "The best algorithm for our dataset is svr with the predicted MAPE equals to 2.17%"
+## [1] "The best algorithm for our dataset is svr with the predicted MAPE equals to 1.58%"
 ```
 
 ```r
@@ -1319,7 +1384,7 @@ kable(MAPE)
 |                 |                      |                 |                 |
 |:----------------|:---------------------|:----------------|:----------------|
 |predicted_ols    |predicted_lasso_ridge |predicted_svr    |predicted_knn    |
-|2.54102929907403 |2.52030263951234      |2.16968344065528 |2.31690349181668 |
+|2.15576277605228 |2.2035986897888       |1.57707254472238 |1.95079595920576 |
 <br>
 
 <font size=4>So SVR, then KNN are performing the best. I think it's rather data-depended which one should we chose </font>
@@ -1916,7 +1981,7 @@ data2_knn_train$results$k = 9
 
 ### SVM
 
-<font size=4>The main advantage of SVM algorithm is that we reduce the risk of overfitting. Moreover, the  appropriate kernel function allows to solve any complex problem. However, it also has some disadvantages. Especially, it is difficult to tune proper hyper parameters, cost -C and gamma. In our case we decided to go on with the following parameters, sigma = 0.031 and C = 0.25. </font>
+<font size=4>The main advantage of SVM algorithm is that we reduce the risk of overfitting. Moreover, the  appropriate kernel function allows to solve any complex problem. However, it also has some disadvantages. Especially, it is difficult to tune proper hyper parameters, cost -C and gamma. In our case we decided to go on with the following parameters, sigma = 0.031 and C = 0.25 because they performed well during our tests. </font>
 
 
 ```r

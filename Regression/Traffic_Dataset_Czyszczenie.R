@@ -221,9 +221,14 @@ data$day2<-as.factor(data$day2)
 
 data_final<-data[,c(8,2,5,11,14,15)]
 
+X<-sample(seq(1:29687), 3000)
+
+data_validation <- data_final[X,]
+
+data_final<-data_final[-X, ]
+
 
 ################# Test data
-a<-data_final[which(data_final$traffic<10),]
 
 
 data_test <- read.csv("C:/Users/orjen/OneDrive/Desktop/Projekt R/traffic_test.csv")
@@ -595,10 +600,10 @@ ggplot(data.frame(real = data_final$traffic,
 
 library(MLmetrics)
 
-predicted_ols <- predict(traffic_lm, data_final)
-predicted_lasso_ridge <- predict(traffic_elastic , data_final)
-predicted_svr <- predict(data2.svm_Radial2 , data_final)
-predicted_knn <- predict(traffic_knn, data_final)
+predicted_ols <- predict(traffic_lm, data_validation)
+predicted_lasso_ridge <- predict(traffic_elastic , data_validation)
+predicted_svr <- predict(data2.svm_Radial2 , data_validation)
+predicted_knn <- predict(traffic_knn, data_validation)
 
 predictions<-data.frame(predicted_ols,predicted_lasso_ridge,predicted_svr,predicted_knn)
 
@@ -620,7 +625,7 @@ for(i in 1:length(predictions))
   }
 }
 
-MAPE(predicted_knn,data_final$traffic)
+MAPE(predicted_knn , data_validation$traffic + 1)
 
 # So at the end I can only cite the function
 # "The best algorithm for our dataset is knn with the predicted MAPE equals to 36.67%"

@@ -120,7 +120,7 @@ season_of_the_year <- function(x) {
 ```r
 day_of_the_wk<- function(x) {
   result<-list()
-  if(x=='Saturday' || x=='Sunday'){
+  if(x=='sobota' || x=='niedziela'){
     result<-"Weekend"
   } 
   else{
@@ -226,8 +226,10 @@ svm_Radial2 <- train(traffic~. + weather_general*hour2  + day2*hour2 + weather_g
 
 
 ```
-## [1] 2.169683
+## [1] 2.169793
 ```
+
+
 
 <br>
 
@@ -523,18 +525,5 @@ kable(balanced_accuracy)
 
 <font size=5><b> Our expected Balanced Accuracy for test dataset equals ``0.8052973`` </b></font> 
 
-## Predictions
 
-```
-##  [1] "id"                            "age"                          
-##  [3] "gender"                        "education"                    
-##  [5] "country"                       "ethnicity"                    
-##  [7] "personality_neuroticism"       "personality_extraversion"     
-##  [9] "personality_openness"          "personality_agreeableness"    
-## [11] "personality_conscientiousness" "personality_impulsiveness"    
-## [13] "personality_sensation"         "consumption_alcohol"          
-## [15] "consumption_amphetamines"      "consumption_caffeine"         
-## [17] "consumption_cannabis"          "consumption_chocolate"        
-## [19] "consumption_mushrooms"         "consumption_nicotine"         
-## [21] "personality"
-```
+
