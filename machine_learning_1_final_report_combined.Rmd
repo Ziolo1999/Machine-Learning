@@ -95,8 +95,9 @@ ggplot(data, aes(x=date_time, y=traffic))+
 data$date_time <- as.POSIXct(data$date_time, format = "%Y-%m-%d %H:%M:%S")
 yq <- as.yearqtr(data$date_time, format = "%Y-%m-%d %H:%M:%S")
 data$kwartal<-format(yq, format = "%q")
-data$kwartal<- as.factor(data$kwartal)
 data$hour<-format(data$date_time, format='%H')
+data$hour<-as.numeric(data$hour)
+
 data$month<-format(data$date_time, format='%m')
 data$day<-weekdays(data$date_time)
 
@@ -144,7 +145,7 @@ ggplot(data, aes(x=hour, y=traffic))+
 
 data$hour2<-lapply(data$hour,time_of_the_day)
 data$hour2<-as.character(data$hour2)
-data$hour2<- as.factor(data$hour2)
+data$hour2<-as.factor(data$hour2)
 
 ```
 <br>
@@ -706,10 +707,9 @@ kable(MAPE)
 ```
 <br>
 
-<font size=4> So at the end I can only say that our book to Machine Learning was quite right in a judge that
-KNN is very often a most optimal alogirhtm. Definitely im gonna finish this book during our summer break </font>
+<font size=4>So SVR, then KNN are performing the best. I think it's rather data-depended which one should we chose </font>
 
-<font size=4> Expected error? about 2-3% in MAPE. Exactly 2.33% </font>
+<font size=4> Expected error? about 2-3% in MAPE. Exactly 2.17% </font>
 
 <br>
 <br><br>

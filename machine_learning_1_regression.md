@@ -192,7 +192,7 @@ day_of_the_wk<- function(x) {
 
 <br>
 
-### The best algorithm - KNN
+### The best algorithm - SVR
 
 <br>
 
@@ -201,15 +201,16 @@ day_of_the_wk<- function(x) {
 ctrl_cv5 <- trainControl(method = "cv",
                          number = 5)
 
-k_possible <-data.frame(k=19) ## The value 19 is the best for our dataset so im gonna go with it
+parametersC_sigma2 <- 
+  expand.grid(C = 415,
+              sigma = 0.1)
 
-traffic_knn <- 
-  train(traffic~. + weather_general*hour2  + day2*hour2 + weather_general*day2, 
-        data = data_final,
-        method = "knn",
-        trControl = ctrl_cv5,
-        tuneGrid = k_possible,
-        preProcess = c("range"))
+
+svm_Radial2 <- train(traffic~. + weather_general*hour2  + day2*hour2 + weather_general*day2, 
+                            data = data_final, 
+                            method = "svmRadial",
+                            tuneGrid = parametersC_sigma2,
+                            trControl = ctrl_cv5)
 ```
 
 <br>
@@ -225,12 +226,10 @@ traffic_knn <-
 
 
 ```
-## [1] 2.316903
+## [1] 2.169793
 ```
 
-<font size=4> I just added +1 to the data_final$traffic because there are 0 values and there are inf values</font>
-
-<font size=5><b> Our expected MAPE for test dataset equals 2.316903%</b></font>
+<br>
 
 # Classification
 

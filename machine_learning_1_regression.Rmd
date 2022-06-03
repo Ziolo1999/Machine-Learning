@@ -237,7 +237,7 @@ kable(head(data_final,20))
 
 <br>
 
-### The best algorithm - KNN
+### The best algorithm - SVR
 
 <br>
 
@@ -246,15 +246,16 @@ kable(head(data_final,20))
 ctrl_cv5 <- trainControl(method = "cv",
                          number = 5)
 
-k_possible <-data.frame(k=19) ## The value 19 is the best for our dataset so im gonna go with it
+parametersC_sigma2 <- 
+  expand.grid(C = 415,
+              sigma = 0.1)
 
-traffic_knn <- 
-  train(traffic~. + weather_general*hour2  + day2*hour2 + weather_general*day2, 
-        data = data_final,
-        method = "knn",
-        trControl = ctrl_cv5,
-        tuneGrid = k_possible,
-        preProcess = c("range"))
+
+svm_Radial2 <- train(traffic~. + weather_general*hour2  + day2*hour2 + weather_general*day2, 
+                            data = data_final, 
+                            method = "svmRadial",
+                            tuneGrid = parametersC_sigma2,
+                            trControl = ctrl_cv5)
 
 ```
 
@@ -264,7 +265,7 @@ traffic_knn <-
 
 <br>
 ```{r, figures-side2, fig.show="hold", echo=FALSE}
-predicted2 = predict(traffic_knn , data_final)
+predicted2 = predict(svm_Radial2 , data_final)
 ggplot(data.frame(real = data_final$traffic,
                   predicted = predicted2 ),
        aes(x = predicted, 
@@ -284,9 +285,7 @@ MAPE(predicted2, data_final$traffic+1)
 
 ```
 
-<font size=4> I just added +1 to the data_final$traffic because there are 0 values and there are inf values</font>
-
-<font size=5><b> Our expected MAPE for test dataset equals 2.316903%</b></font>
+<br>
 
 # Classification
 
