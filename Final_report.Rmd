@@ -31,6 +31,8 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+# Please set up language: "POL" or "ENG"
+language = "ENG"
 ```
 
 
@@ -323,12 +325,22 @@ season_of_the_year <- function(x) {
 
 day_of_the_wk<- function(x) {
   result<-list()
-  if(x=='sobota' || x=='niedziela'){
-    result<-"Weekend"
-  } 
+  if(language == "ENG"){
+    if(x=='Saturday' || x=='Sunday'){
+      result<-"Weekend"
+    } 
+    else{
+      result <-"Working_day"}
+    return(result)
+  }
   else{
-    result <-"Working_day"}
-  return(result)
+    if(x=='sobota' || x=='niedziela'){
+      result<-"Weekend"
+    } 
+    else{
+      result <-"Working_day"}
+    return(result)
+  }
 }
 
 data$season<-lapply(data$month,season_of_the_year)
@@ -1007,16 +1019,24 @@ data2 = data2[,-3]
 
 <font size=4>Each of the presented algorithms has its own benefits and drawbacks and this is the reason why we decided to go with all of them. We wanted to compare them and choose the most accurate for this dataset. </font>
 
-### Cross-Validation
+### Cross-Validation & Data Splitting
 
 <br>
 
-<font size=4>Overfitting is one of the burdensome issue in Machine Learning. As we want to perform as accurate model as possible we needed to minimize that problem, so we decided to apply a Cross Validation procedure. Even though it is computationally expensive, we do not waste too much data which is extremely important in our case. Ultimately, we decided to go with five folds and three repeats. Additionally, as it was previously said, we used upsampling method.</font>
+<font size=4>Our first step before modelling was splitting data into two parts. We wanted to obtain part of data on which we could test our final parameters. 
+Overfitting is one of the burdensome issue in Machine Learning. As we want to perform as accurate model as possible we needed to minimize that problem, so we decided to apply a Cross Validation procedure. Even though it is computationally expensive, we do not waste too much data which is extremely important in our case. Ultimately, we decided to go with five folds and three repeats. Additionally, as it was previously said we used upsampling procedure.</font>
 
 ```{r cross-validation2}
 options(contrasts = c("contr.treatment",  # for non-ordinal factors
                       "contr.treatment")) # for ordinal factors
 set.seed(9432398) # We specify random seed
+
+# Data Splitting
+data_training <- createDataPartition(data2$consumption_cocaine_last_month,
+                                            p = 1099/1500, 
+                                            list = FALSE) 
+data2 <- data2[c(data_training),]
+data2_test <- data2[-c(data_training),]
 
 # Train control with cross-validation
 ctrl_cv5 <- trainControl(method = "repeatedcv",
@@ -1026,7 +1046,6 @@ ctrl_cv5 <- trainControl(method = "repeatedcv",
                          repeats = 3)
 
 ctrl_cv5$sampling = "up"
-
 ```
 
 <br>
@@ -1162,32 +1181,32 @@ plot(data2_rf_train)
 
 <br>
 
-<font size=4>In order to choose our final model we decided to run predictions on the whole dataset using all algorithms. We used parameters that were selected in our previous steps. We also decided to choose Balanced Accuracy as our final index to evaluate accuracy of our model. </font>
+<font size=4>In order to choose our final model we decided to run predictions on the test dataset using all algorithms. We used parameters that were selected in our previous steps. We also decided to choose Balanced Accuracy as our final index to evaluate accuracy of our model. </font>
 
 ```{r model_evaluation2}
 
-logit_fitted = predict(data2_logit_train1, data2)
+logit_fitted = predict(data2_logit_train1, data2_test)
 logit_results = summary_binary_class(predicted_classes = logit_fitted,
-                     real = data2$consumption_cocaine_last_month)
+                     real = data2_test$consumption_cocaine_last_month)
 
-knn_fitted = predict(data2_knn_train, data2)
+knn_fitted = predict(data2_knn_train, data2_test)
 knn_results = summary_binary_class(predicted_classes = knn_fitted,
-                     real = data2$consumption_cocaine_last_month)
+                     real = data2_test$consumption_cocaine_last_month)
 
-svm_fitted = predict(data2_svm_train, data2)
+svm_fitted = predict(data2_svm_train, data2_test)
 svm_results = summary_binary_class(predicted_classes = svm_fitted,
-                     real = data2$consumption_cocaine_last_month)
+                     real = data2_test$consumption_cocaine_last_month)
 
-rf_fitted = predict(data2_rf_train, data2)
+rf_fitted = predict(data2_rf_train, data2_test)
 rf_results = summary_binary_class(predicted_classes = rf_fitted,
-                     real = data2$consumption_cocaine_last_month)
+                     real = data2_test$consumption_cocaine_last_month)
 
 balanced_accuracy  = matrix(1:4, nrow=1, ncol=4)
 
-balanced_accuracy[1,1]=confusionMatrix(as.factor(logit_fitted), data2$consumption_cocaine_last_month)$byClass[11]
-balanced_accuracy[1,2]=confusionMatrix(as.factor(knn_fitted), data2$consumption_cocaine_last_month)$byClass[11]
-balanced_accuracy[1,3]=confusionMatrix(as.factor(svm_fitted), data2$consumption_cocaine_last_month)$byClass[11]
-balanced_accuracy[1,4]=confusionMatrix(as.factor(rf_fitted), data2$consumption_cocaine_last_month)$byClass[11]
+balanced_accuracy[1,1]=confusionMatrix(as.factor(logit_fitted), data2_test$consumption_cocaine_last_month)$byClass[11]
+balanced_accuracy[1,2]=confusionMatrix(as.factor(knn_fitted), data2_test$consumption_cocaine_last_month)$byClass[11]
+balanced_accuracy[1,3]=confusionMatrix(as.factor(svm_fitted), data2_test$consumption_cocaine_last_month)$byClass[11]
+balanced_accuracy[1,4]=confusionMatrix(as.factor(rf_fitted), data2_test$consumption_cocaine_last_month)$byClass[11]
 
 colnames(balanced_accuracy) = c("Logit","KNN","SVM","Random Forest")
 rownames(balanced_accuracy) = c("Balanced Accuracy")
@@ -1198,5 +1217,5 @@ print(paste0('The best algorithm for our dataset is ', colnames(balanced_accurac
 
 ```
 
-<font size=4> Even though the highest Balanced Accuracy was performed by Random Forest, ultimately we decided to go with SVM method. </font>
+<font size=4> Even though the highest Balanced Accuracy was performed by Random Forest, ultimately we decided to go with SVM method which expected Balance Accuracy is `r paste0(round(balanced_accuracy[3],4)*100,"%")`. </font>
 
